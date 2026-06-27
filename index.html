@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>ADSD Steel Technical Services Contracting L.L.C — Engineering the Future of Prefabricated Architecture</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"></link>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Archivo:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink:    '#0D0D0D',
+        ink2:   '#121315',
+        ink3:   '#1A1A1A',
+        line:   '#26282C',
+        ti:     '#F2F3F5',
+        tidim:  '#9BA1A8',
+        steel:  '#4DA3FF',
+        steeldk:'#1E5FA8',
+        safety: '#FF6B1A'
+      },
+      fontFamily: {
+        display: ['Anton', 'sans-serif'],
+        body:    ['Archivo', 'sans-serif'],
+        mono:    ['"IBM Plex Mono"', 'monospace']
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  html { background: #0D0D0D; }
+  body { background: #0D0D0D; color: #F2F3F5; overflow-x: hidden; }
+  ::selection { background: #4DA3FF; color: #0D0D0D; }
+
+  /* ---------- custom cursor ---------- */
+  @media (pointer: fine) {
+    body { cursor: none; }
+    a, button { cursor: none; }
+  }
+  #cursor-dot, #cursor-ring {
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+    border-radius: 9999px; transform: translate(-50%, -50%);
+    will-change: transform;
+  }
+  #cursor-dot  { width: 6px;  height: 6px;  background: #4DA3FF; }
+  #cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(77,163,255,.55); transition: width .25s, height .25s, border-color .25s, background-color .25s; }
+  #cursor-ring.is-hover { width: 56px; height: 56px; border-color: rgba(255,107,26,.9); background: rgba(255,107,26,.08); }
+  @media (pointer: coarse) { #cursor-dot, #cursor-ring, #mouse-glow { display: none; } }
+
+  /* ---------- mouse glow ---------- */
+  #mouse-glow {
+    position: fixed; top: 0; left: 0; width: 520px; height: 520px;
+    pointer-events: none; z-index: 1; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(77,163,255,.07) 0%, rgba(77,163,255,0) 62%);
+    will-change: transform;
+  }
+
+  /* ---------- type helpers ---------- */
+  .display-xl { font-family: Anton, sans-serif; line-height: .96; letter-spacing: .01em; text-transform: uppercase; }
+  .reveal-line { display: block; overflow: hidden; }
+  .reveal-line > span { display: block; transform: translateY(112%); }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: #4DA3FF; }
+
+  /* ---------- segment cards (hover-expanding row) ---------- */
+  #segment-row { display: flex; flex-direction: column; gap: 1px; }
+  @media (min-width: 1024px) {
+    #segment-row { flex-direction: row; height: 560px; }
+    .seg-card { flex: 1 1 0%; transition: flex-grow .65s cubic-bezier(.22,1,.36,1); }
+    .seg-card:hover { flex-grow: 2.6; }
+    .seg-card .seg-body { opacity: 0; transform: translateY(14px); transition: opacity .45s .12s, transform .45s .12s; }
+    .seg-card:hover .seg-body { opacity: 1; transform: translateY(0); }
+    .seg-card .seg-title-vert { transition: opacity .3s; }
+  }
+  .seg-card { position: relative; background: #121315; border: 1px solid #26282C; overflow: hidden; }
+  .seg-card::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(160deg, rgba(77,163,255,.10), rgba(77,163,255,0) 45%);
+    opacity: 0; transition: opacity .5s;
+  }
+  .seg-card:hover::after { opacity: 1; }
+  .seg-card:hover { border-color: rgba(77,163,255,.45); }
+
+  /* ---------- registry ---------- */
+  .reg-row { border-bottom: 1px solid #26282C; transition: background-color .25s, padding-left .25s; }
+  .reg-row:hover { background: #121315; padding-left: 10px; }
+  .reg-tab { transition: color .25s, border-color .25s, background-color .25s; }
+  .reg-tab.is-active { color: #0D0D0D; background: #4DA3FF; border-color: #4DA3FF; }
+  .reg-row.is-hidden { display: none; }
+
+  /* ---------- misc ---------- */
+  .hairline { height: 1px; background: #26282C; }
+  .tick { color: #FF6B1A; }
+  .stat-num { font-variant-numeric: tabular-nums; }
+  .marquee-track { display: flex; gap: 4rem; width: max-content; animation: marquee 28s linear infinite; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+    .reveal-line > span { transform: none !important; }
+  }
+</style>
+</head>
+
+<template id="__bundler_thumbnail" data-bg-color="#0D0D0D">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0D0D0D"></rect>
+    <g stroke="#35506e" stroke-width="3" fill="none" opacity="0.6">
+      <path d="M360 300 L600 240 L840 300 L600 360 Z"></path>
+      <path d="M360 300 L360 520 L600 580 L600 360"></path>
+      <path d="M840 300 L840 520 L600 580 L600 360"></path>
+      <path d="M360 520 L600 460 L840 520"></path>
+    </g>
+    <g fill="#4DA3FF">
+      <circle cx="360" cy="300" r="12"></circle>
+      <circle cx="840" cy="300" r="12"></circle>
+      <circle cx="360" cy="520" r="12"></circle>
+      <circle cx="840" cy="520" r="12"></circle>
+      <circle cx="600" cy="240" r="12"></circle>
+      <circle cx="600" cy="580" r="12"></circle>
+    </g>
+    <circle cx="600" cy="360" r="14" fill="#FF6B1A"></circle>
+    <circle cx="600" cy="460" r="14" fill="#FF6B1A"></circle>
+    <text x="600" y="700" font-family="Arial, sans-serif" font-size="84" font-weight="bold" fill="#F2F3F5" text-anchor="middle" letter-spacing="6">ADSD</text>
+  </svg>
+</template>
+
+<body class="font-body antialiased bg-ink text-ti">
+
+<div id="mouse-glow"></div>
+<div id="cursor-ring"></div>
+<div id="cursor-dot"></div>
+
+<!-- ================= NAV ================= -->
+<header class="fixed top-0 inset-x-0 z-50 border-b border-line/70 bg-ink/80 backdrop-blur-md" data-screen-label="Navigation">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-6">
+    <a href="#top" class="flex items-baseline gap-3 group">
+      <span class="font-display text-2xl tracking-wide text-ti group-hover:text-steel transition-colors">ADSD</span>
+      <span class="hidden md:inline font-mono text-[10px] tracking-[.22em] text-tidim uppercase">Steel Technical Services Contracting L.L.C</span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-8 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">
+      <a href="#enterprise" class="hover:text-ti transition-colors" data-hover="1">Enterprise</a>
+      <a href="#segments" class="hover:text-ti transition-colors" data-hover="1">Segments</a>
+      <a href="#maintenance" class="hover:text-ti transition-colors" data-hover="1">Maintenance</a>
+      <a href="#registry" class="hover:text-ti transition-colors" data-hover="1">Registry</a>
+      <a href="#reviews" class="hover:text-ti transition-colors" data-hover="1">Reviews</a>
+      <a href="#regulatory" class="hover:text-ti transition-colors" data-hover="1">Regulatory</a>
+    </nav>
+    <a href="tel:+971569968611" data-hover="1"
+       class="font-mono text-[11px] tracking-[.14em] uppercase border border-steel/60 text-steel px-4 py-2 hover:bg-steel hover:text-ink transition-colors">
+      +971 56 996 8611
+    </a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section id="top" class="relative min-h-screen flex flex-col justify-end overflow-hidden" data-screen-label="Hero">
+  <canvas id="hero-canvas" class="absolute inset-0 w-full h-full block"></canvas>
+  <div class="absolute inset-0 bg-gradient-to-b from-ink/30 via-transparent to-ink pointer-events-none"></div>
+
+  <div class="relative z-10 max-w-[1400px] mx-auto w-full px-6 lg:px-10 pt-36 pb-10">
+    <p class="eyebrow mb-6" id="hero-eyebrow">Dubai · Sharjah · Abu Dhabi — United Arab Emirates</p>
+
+    <h1 class="display-xl text-[clamp(2.6rem,8.2vw,8.5rem)] max-w-[14ch]" id="hero-headline">
+      <span class="reveal-line"><span>Engineering</span></span>
+      <span class="reveal-line"><span>the future of</span></span>
+      <span class="reveal-line"><span class="text-steel">prefabricated</span></span>
+      <span class="reveal-line"><span>architecture<span class="tick">.</span></span></span>
+    </h1>
+
+    <div class="mt-14 grid grid-cols-1 sm:grid-cols-3 border-t border-line" id="hero-stats">
+      <div class="py-6 sm:pr-8 border-b sm:border-b-0 border-line sm:border-r">
+        <div class="font-display text-5xl lg:text-6xl stat-num"><span data-count="100">0</span><span class="text-steel">%</span></div>
+        <p class="mt-2 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">In-house staff — zero sub-contracting</p>
+      </div>
+      <div class="py-6 sm:px-8 border-b sm:border-b-0 border-line sm:border-r">
+        <div class="font-display text-5xl lg:text-6xl stat-num"><span data-count="6" data-pad="2">00</span></div>
+        <p class="mt-2 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">Core industrial specializations</p>
+      </div>
+      <div class="py-6 sm:pl-8">
+        <div class="font-display text-5xl lg:text-6xl stat-num"><span data-count="3">0</span></div>
+        <p class="mt-2 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">Emirates powered</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 border-t border-line bg-ink2/70 backdrop-blur-sm">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-10 h-12 flex items-center justify-between">
+      <span class="font-mono text-[10px] tracking-[.24em] uppercase text-tidim">Scroll to explore</span>
+      <span class="font-mono text-[10px] tracking-[.24em] uppercase text-tidim hidden sm:inline">EST. roots since 1999 — Sharjah</span>
+      <span class="w-px h-5 bg-steel animate-pulse"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLIENT MARQUEE ================= -->
+<section class="relative border-b border-line bg-ink overflow-hidden py-8" data-screen-label="Clients" aria-label="Clients">
+  <div class="marquee-track font-mono text-[12px] tracking-[.3em] uppercase text-tidim/80">
+    <span>SEWA</span><span class="tick">/</span><span>Lamprell</span><span class="tick">/</span><span>Al Ghurair Iron &amp; Steel</span><span class="tick">/</span><span>Six Sigma</span><span class="tick">/</span><span>MBS — Meemar Building System</span><span class="tick">/</span><span>Al Aswar Cont. LLC</span><span class="tick">/</span><span>Capital Engineering Consultant</span><span class="tick">/</span><span>Cloid Steel Co.</span><span class="tick">/</span>
+    <span>SEWA</span><span class="tick">/</span><span>Lamprell</span><span class="tick">/</span><span>Al Ghurair Iron &amp; Steel</span><span class="tick">/</span><span>Six Sigma</span><span class="tick">/</span><span>MBS — Meemar Building System</span><span class="tick">/</span><span>Al Aswar Cont. LLC</span><span class="tick">/</span><span>Capital Engineering Consultant</span><span class="tick">/</span><span>Cloid Steel Co.</span><span class="tick">/</span>
+  </div>
+</section>
+
+<!-- ================= THE ENTERPRISE ================= -->
+<section id="enterprise" class="relative py-28 lg:py-40" data-screen-label="The Enterprise">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 lg:gap-16">
+    <div class="lg:col-span-5">
+      <p class="eyebrow mb-6" data-reveal="1">01 — The Enterprise</p>
+      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Absolute internal accountability.</h2>
+      <div class="mt-10 hairline" data-reveal="1"></div>
+      <div class="mt-10 grid grid-cols-2 gap-6" data-reveal="1">
+        <div class="border border-line bg-ink2 p-5">
+          <div class="font-display text-3xl text-steel">1999</div>
+          <p class="mt-1 font-mono text-[10px] tracking-[.16em] uppercase text-tidim">Sharjah industrial roots</p>
+        </div>
+        <div class="border border-line bg-ink2 p-5">
+          <div class="font-display text-3xl text-steel">L.L.C</div>
+          <p class="mt-1 font-mono text-[10px] tracking-[.16em] uppercase text-tidim">Licensed in Dubai &amp; Sharjah</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 lg:pt-20">
+      <p class="text-xl lg:text-2xl leading-relaxed text-ti/90 max-w-[58ch]" data-reveal="1">
+        ADSD Steel Technical Services Contracting L.L.C is committed to supplying exceptional-quality
+        products and services in the prefabricated construction industry — developing and employing the
+        most advanced information, engineering, manufacturing, and delivery systems available.
+      </p>
+      <p class="mt-8 text-base lg:text-lg leading-relaxed text-tidim max-w-[62ch]" data-reveal="1">
+        Our own team carries out the work — without outsourcing or sub-contracting. Trained, dedicated
+        in-house Property Managers schedule and monitor every task we perform, so we remain fully
+        accountable for every service we deliver, on every asset we manage.
+      </p>
+      <ul class="mt-12 grid sm:grid-cols-2 gap-x-10 gap-y-5 font-mono text-[12px] tracking-[.12em] uppercase text-tidim" data-reveal="1">
+        <li class="flex gap-3"><span class="tick">→</span><span>100% in-house execution teams</span></li>
+        <li class="flex gap-3"><span class="tick">→</span><span>Dedicated property managers per asset</span></li>
+        <li class="flex gap-3"><span class="tick">→</span><span>Advanced fabrication &amp; delivery systems</span></li>
+        <li class="flex gap-3"><span class="tick">→</span><span>Free quotes via phone, fax &amp; e-mail</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= INDUSTRIAL SEGMENTS ================= -->
+<section id="segments" class="relative py-28 lg:py-36 bg-ink2 border-y border-line" data-screen-label="Industrial Segments">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+      <div>
+        <p class="eyebrow mb-6" data-reveal="1">02 — Industrial Segments</p>
+        <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Six disciplines. One contractor.</h2>
+      </div>
+      <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Hover a column to expand its scope of work</p>
+    </div>
+
+    <div id="segment-row" data-reveal="1">
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—01</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Structural Steel Fabrication &amp; Installation</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Full-cycle fabrication and erection of primary steel structures for warehouses, industrial sheds and prefabricated buildings across the UAE.</p>
+        </div>
+      </article>
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—02</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Miscellaneous Metal Work</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Handrails, aluminium louvers, car-parking sheds and substation chequer plates — precision metal work engineered to specification.</p>
+        </div>
+      </article>
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—03</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Equipment Installation</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Rigging, setting and alignment of industrial process equipment, executed by our own certified in-house crews.</p>
+        </div>
+      </article>
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—04</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Pipe Fabrication &amp; Inline Equipment</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Pipe fabrication and installation, including inline equipment integration for industrial process facilities.</p>
+        </div>
+      </article>
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—05</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Tanks Installation</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Installation of storage tanks and silo structures — including elevated platforms, access stairs and supporting steelwork.</p>
+        </div>
+      </article>
+
+      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+        <div class="flex lg:flex-col gap-4">
+          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—06</span>
+          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Supply Services</h3>
+        </div>
+        <div class="seg-body mt-6 hidden lg:block">
+          <div class="hairline mb-4"></div>
+          <p class="text-sm text-tidim leading-relaxed">Anchor bolts, fasteners and certified manpower supply — reach our sales staff by phone, fax or e-mail for a free quote.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= DIVISION SHOWCASE ================= -->
+<section id="maintenance" class="relative py-28 lg:py-40 overflow-hidden" data-screen-label="Building Maintenance Division">
+  <div aria-hidden="true" class="absolute -right-24 top-1/2 -translate-y-1/2 font-display text-[26vw] leading-none text-ink3 select-none pointer-events-none uppercase">BMD</div>
+  <div class="relative max-w-[1400px] mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12">
+    <div class="lg:col-span-6">
+      <p class="eyebrow mb-6" data-reveal="1">03 — Division Showcase</p>
+      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Building <span class="text-safety">Maintenance</span> arm.</h2>
+      <p class="mt-10 text-lg leading-relaxed text-tidim max-w-[56ch]" data-reveal="1">
+        Our in-house staff performs all cleaning and maintenance, trash and recycling management, snow
+        removal, and handyman work — while our trained Property Managers schedule and monitor everything
+        we perform. We stay fully accountable, because our own team carries out the work.
+      </p>
+      <a href="mailto:ads.techdxb@gmail.com?subject=Building%20Maintenance%20Enquiry" data-hover="1"
+         class="inline-flex items-center gap-3 mt-10 font-mono text-[12px] tracking-[.18em] uppercase border border-safety/70 text-safety px-6 py-3 hover:bg-safety hover:text-ink transition-colors">
+        Enquire about maintenance <span>→</span>
+      </a>
+    </div>
+    <div class="lg:col-span-6 grid sm:grid-cols-2 gap-px bg-line border border-line self-start lg:mt-24" data-reveal="1">
+      <div class="bg-ink p-7">
+        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—01</span>
+        <h3 class="mt-5 font-display text-xl uppercase">Cleaning &amp; Maintenance</h3>
+        <p class="mt-3 text-sm text-tidim leading-relaxed">Scheduled and on-call facility upkeep, executed entirely by ADSD staff.</p>
+      </div>
+      <div class="bg-ink p-7">
+        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—02</span>
+        <h3 class="mt-5 font-display text-xl uppercase">Trash &amp; Recycling</h3>
+        <p class="mt-3 text-sm text-tidim leading-relaxed">End-to-end waste and recycling management for industrial and commercial assets.</p>
+      </div>
+      <div class="bg-ink p-7">
+        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—03</span>
+        <h3 class="mt-5 font-display text-xl uppercase">Snow Removal</h3>
+        <p class="mt-3 text-sm text-tidim leading-relaxed">Specialist clearing services for cold-storage and controlled-environment facilities.</p>
+      </div>
+      <div class="bg-ink p-7">
+        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—04</span>
+        <h3 class="mt-5 font-display text-xl uppercase">Handyman Work</h3>
+        <p class="mt-3 text-sm text-tidim leading-relaxed">General repairs and small works, scheduled and verified by our Property Managers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE REGISTRY ================= -->
+<section id="registry" class="relative py-28 lg:py-36 bg-ink2 border-y border-line" data-screen-label="Project Registry">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="flex flex-wrap items-end justify-between gap-8 mb-12">
+      <div>
+        <p class="eyebrow mb-6" data-reveal="1">04 — The Registry</p>
+        <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Project log.</h2>
+      </div>
+      <div class="flex flex-wrap gap-2" id="registry-tabs" data-reveal="1">
+        <button class="reg-tab is-active font-mono text-[11px] tracking-[.16em] uppercase border border-line text-tidim px-5 py-2.5" data-filter="all" data-hover="1">All</button>
+        <button class="reg-tab font-mono text-[11px] tracking-[.16em] uppercase border border-line text-tidim px-5 py-2.5" data-filter="sharjah" data-hover="1">Sharjah</button>
+        <button class="reg-tab font-mono text-[11px] tracking-[.16em] uppercase border border-line text-tidim px-5 py-2.5" data-filter="dubai" data-hover="1">Dubai</button>
+        <button class="reg-tab font-mono text-[11px] tracking-[.16em] uppercase border border-line text-tidim px-5 py-2.5" data-filter="abudhabi" data-hover="1">Abu Dhabi</button>
+      </div>
+    </div>
+
+    <div class="border-t border-line" id="registry-table" data-reveal="1">
+      <div class="hidden md:grid grid-cols-12 gap-4 py-4 font-mono text-[10px] tracking-[.22em] uppercase text-tidim/70 border-b border-line">
+        <span class="col-span-1">No.</span>
+        <span class="col-span-4">Project / Location</span>
+        <span class="col-span-4">Main Contractor</span>
+        <span class="col-span-2">Client</span>
+        <span class="col-span-1 text-right">Emirate</span>
+      </div>
+
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="sharjah">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">01</span>
+        <span class="md:col-span-4 font-medium">Hamriyah Free Zone</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">MBS — Meemar Building System</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">SEWA</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">SHJ</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="sharjah">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">02</span>
+        <span class="md:col-span-4 font-medium">Ind-18, Sharjah</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">Al Aswar Cont. LLC</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Al Aswar</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">SHJ</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="sharjah">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">03</span>
+        <span class="md:col-span-4 font-medium">Khalid Port</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">Al Aamedah Al Maseyah</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Lamprell</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">SHJ</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="abudhabi">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">04</span>
+        <span class="md:col-span-4 font-medium">CMW, Abu Dhabi</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">MBS — Meemar Building System</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Six Sigma</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">AUH</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="sharjah">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">05</span>
+        <span class="md:col-span-4 font-medium">Hamriyah Free Zone</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">Al Aamedah Al Maseyah</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Lamprell</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">SHJ</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="abudhabi">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">06</span>
+        <span class="md:col-span-4 font-medium">ICAD-1, Mussafah</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">MBS — Meemar Building System</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Al Ghurair Iron &amp; Steel</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">AUH</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="abudhabi">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">07</span>
+        <span class="md:col-span-4 font-medium">ICAD-1, Mussafah</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">MBS — Meemar Building System</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Al Ghurair Iron &amp; Steel</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">AUH</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="abudhabi">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">08</span>
+        <span class="md:col-span-4 font-medium">KIZAD, Abu Dhabi</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">Capital Engineering Consultant</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Cloid Steel Co.</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">AUH</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="abudhabi">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">09</span>
+        <span class="md:col-span-4 font-medium">ICAD-1, Mussafah</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">MBS — Meemar Building System</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Al Ghurair Iron &amp; Steel</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">AUH</span>
+      </div>
+      <div class="reg-row grid md:grid-cols-12 gap-1 md:gap-4 py-5" data-emirate="dubai">
+        <span class="font-mono text-xs text-tidim md:col-span-1 pt-1">10</span>
+        <span class="md:col-span-4 font-medium">Dubai — Operations HQ</span>
+        <span class="md:col-span-4 text-tidim text-sm pt-0.5">ADSD Steel Technical Services</span>
+        <span class="md:col-span-2 text-steel text-sm pt-0.5">Technical Services Works</span>
+        <span class="md:col-span-1 md:text-right font-mono text-[10px] tracking-[.14em] uppercase text-tidim pt-1.5">DXB</span>
+      </div>
+
+      <p id="registry-empty" class="hidden py-10 font-mono text-[12px] tracking-[.18em] uppercase text-tidim">No entries for this emirate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLIENT REVIEWS ================= -->
+<section id="reviews" class="relative py-28 lg:py-40" data-screen-label="Client Reviews">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="flex flex-wrap items-end justify-between gap-8 mb-16">
+      <div>
+        <p class="eyebrow mb-6" data-reveal="1">05 — Client Reviews</p>
+        <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Rate your experience.</h2>
+      </div>
+      <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Leave a review — it appears below instantly</p>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-px bg-line border border-line">
+      <div class="lg:col-span-4 bg-ink2 p-8 lg:p-10">
+        <div class="flex items-end gap-4">
+          <div id="rv-avg" class="font-display text-6xl leading-none">0.0</div>
+          <div class="pb-1">
+            <div id="rv-avg-stars" class="text-2xl tracking-tight text-steeltx">★★★★★</div>
+            <div id="rv-count" class="mt-1 font-mono text-[11px] tracking-[.16em] uppercase text-tidim">0 reviews</div>
+          </div>
+        </div>
+        <div id="rv-bars" class="mt-8 space-y-2"></div>
+      </div>
+
+      <div class="lg:col-span-8 bg-ink2 p-8 lg:p-10">
+        <form id="rv-form" class="grid sm:grid-cols-2 gap-5" novalidate>
+          <div>
+            <label class="block font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-2">Name</label>
+            <input name="name" maxlength="40" class="w-full bg-ink border border-line px-4 py-3 text-ti text-sm placeholder:text-tidim/60 focus:border-steel focus:outline-none transition-colors" placeholder="Your name" />
+          </div>
+          <div>
+            <label class="block font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-2">Company <span class="text-tidim/50">(optional)</span></label>
+            <input name="company" maxlength="50" class="w-full bg-ink border border-line px-4 py-3 text-ti text-sm placeholder:text-tidim/60 focus:border-steel focus:outline-none transition-colors" placeholder="Company / contractor" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-2">Rating</label>
+            <div id="rv-stars-input" class="flex gap-1 text-3xl text-line cursor-pointer select-none">
+              <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+            </div>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-2">Review</label>
+            <textarea name="text" maxlength="400" rows="3" class="w-full bg-ink border border-line px-4 py-3 text-ti text-sm placeholder:text-tidim/60 focus:border-steel focus:outline-none transition-colors resize-none" placeholder="Tell us about working with ADSD…"></textarea>
+          </div>
+          <div class="sm:col-span-2 flex items-center justify-between gap-4 flex-wrap">
+            <p id="rv-msg" class="font-mono text-[10px] tracking-[.16em] uppercase text-safetytx"></p>
+            <button type="submit" class="font-mono text-[12px] tracking-[.18em] uppercase bg-steel text-ti px-8 py-4 hover:bg-steeltx hover:text-white transition-colors" data-hover="1">Submit review →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="rv-list" class="mt-px grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line border border-line border-t-0"></div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="relative py-28 lg:py-40 overflow-hidden" data-screen-label="Call to Action">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 text-center">
+    <p class="eyebrow mb-8" data-reveal="1">Free quotes by phone, fax &amp; e-mail</p>
+    <h2 class="display-xl text-[clamp(2.4rem,6.4vw,6.4rem)]" data-split="1">Let&rsquo;s build your next structure.</h2>
+    <div class="mt-12 flex flex-wrap justify-center gap-4" data-reveal="1">
+      <a href="tel:+971569968611" data-hover="1"
+         class="font-mono text-[12px] tracking-[.18em] uppercase bg-steel text-ink px-8 py-4 hover:bg-ti transition-colors">
+        Call +971 56 996 8611
+      </a>
+      <a href="mailto:ads.techdxb@gmail.com" data-hover="1"
+         class="font-mono text-[12px] tracking-[.18em] uppercase border border-line text-ti px-8 py-4 hover:border-steel hover:text-steel transition-colors">
+        ads.techdxb@gmail.com
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REGULATORY FOOTER ================= -->
+<footer id="regulatory" class="relative border-t border-line bg-ink2" data-screen-label="Regulatory Footer">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-16">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line mb-14">
+      <div class="bg-ink p-7">
+        <p class="font-mono text-[10px] tracking-[.22em] uppercase text-tidim mb-3">Dubai Commercial License</p>
+        <p class="font-display text-2xl stat-num">No. 1050680</p>
+        <p class="mt-2 text-xs text-tidim">Dept. of Economic Development · Technical Services Works · L.L.C</p>
+      </div>
+      <div class="bg-ink p-7">
+        <p class="font-mono text-[10px] tracking-[.22em] uppercase text-tidim mb-3">Sharjah Industrial License</p>
+        <p class="font-display text-2xl stat-num">No. 502971</p>
+        <p class="mt-2 text-xs text-tidim">Economic Development Dept. · Industrial roots since 1999</p>
+      </div>
+      <div class="bg-ink p-7">
+        <p class="font-mono text-[10px] tracking-[.22em] uppercase text-tidim mb-3">Tax Registration Number</p>
+        <p class="font-display text-2xl stat-num">104023207400003</p>
+        <p class="mt-2 text-xs text-tidim">Federal Tax Authority · United Arab Emirates</p>
+      </div>
+      <div class="bg-ink p-7">
+        <p class="font-mono text-[10px] tracking-[.22em] uppercase text-tidim mb-3">Direct Hotline</p>
+        <p class="font-display text-2xl stat-num"><a href="tel:+971569968611" class="hover:text-steel transition-colors" data-hover="1">+971 56 996 8611</a></p>
+        <p class="mt-2 text-xs text-tidim"><a href="mailto:ads.techdxb@gmail.com" class="hover:text-steel transition-colors" data-hover="1">ads.techdxb@gmail.com</a></p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-6 pt-8 border-t border-line">
+      <div class="flex items-baseline gap-3">
+        <span class="font-display text-xl text-ti">ADSD</span>
+        <span class="font-mono text-[10px] tracking-[.2em] text-tidim uppercase">Steel Technical Services Contracting L.L.C</span>
+      </div>
+      <p class="font-mono text-[10px] tracking-[.2em] text-tidim/70 uppercase">Dubai · Sharjah · Abu Dhabi — UAE</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= SCRIPTS ================= -->
+<script>
+(function () {
+  'use strict';
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer  = window.matchMedia('(pointer: fine)').matches;
+
+  /* ============ CUSTOM CURSOR + GLOW ============ */
+  if (finePointer) {
+    var dot  = document.getElementById('cursor-dot');
+    var ring = document.getElementById('cursor-ring');
+    var glow = document.getElementById('mouse-glow');
+    var mx = innerWidth / 2, my = innerHeight / 2;
+    var rx = mx, ry = my, gx = mx, gy = my;
+
+    addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+    (function cursorLoop() {
+      rx += (mx - rx) * 0.18;  ry += (my - ry) * 0.18;
+      gx += (mx - gx) * 0.06;  gy += (my - gy) * 0.06;
+      dot.style.transform  = 'translate(' + (mx - 3)  + 'px,' + (my - 3)  + 'px)';
+      ring.style.transform = 'translate(' + (rx - ring.offsetWidth / 2) + 'px,' + (ry - ring.offsetHeight / 2) + 'px)';
+      glow.style.transform = 'translate(' + (gx - 260) + 'px,' + (gy - 260) + 'px)';
+      requestAnimationFrame(cursorLoop);
+    })();
+
+    document.querySelectorAll('a, button, [data-hover]').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { ring.classList.add('is-hover'); });
+      el.addEventListener('mouseleave', function () { ring.classList.remove('is-hover'); });
+    });
+  }
+
+  /* ============ THREE.JS HERO — STRUCTURAL NODE LATTICE ============ */
+  (function initHero() {
+    var canvas = document.getElementById('hero-canvas');
+    if (!canvas || !window.THREE) return;
+
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+    var scene  = new THREE.Scene();
+    scene.fog  = new THREE.Fog(0x0d0d0d, 14, 34);
+    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 1.2, 16);
+
+    /* lattice of structural nodes */
+    var NX = 11, NY = 5, NZ = 5, SP = 2.2;
+    var nodeCount = NX * NY * NZ;
+    var basePos = new Float32Array(nodeCount * 3);
+    var idx = 0;
+    for (var ix = 0; ix < NX; ix++) {
+      for (var iy = 0; iy < NY; iy++) {
+        for (var iz = 0; iz < NZ; iz++) {
+          basePos[idx * 3]     = (ix - (NX - 1) / 2) * SP;
+          basePos[idx * 3 + 1] = (iy - (NY - 1) / 2) * SP;
+          basePos[idx * 3 + 2] = (iz - (NZ - 1) / 2) * SP;
+          idx++;
+        }
+      }
+    }
+    var nodeId = function (x, y, z) { return x * NY * NZ + y * NZ + z; };
+
+    /* points */
+    var ptsGeo = new THREE.BufferGeometry();
+    var ptsPos = new Float32Array(basePos);
+    ptsGeo.setAttribute('position', new THREE.BufferAttribute(ptsPos, 3));
+    var pts = new THREE.Points(ptsGeo, new THREE.PointsMaterial({
+      color: 0x4da3ff, size: 0.09, transparent: true, opacity: 0.95, sizeAttenuation: true
+    }));
+
+    /* a few safety-orange anchor nodes */
+    var anchorIdx = [];
+    for (var a = 0; a < nodeCount; a += 37) anchorIdx.push(a);
+    var ancGeo = new THREE.BufferGeometry();
+    var ancPos = new Float32Array(anchorIdx.length * 3);
+    ancGeo.setAttribute('position', new THREE.BufferAttribute(ancPos, 3));
+    var anchors = new THREE.Points(ancGeo, new THREE.PointsMaterial({
+      color: 0xff6b1a, size: 0.16, transparent: true, opacity: 0.95, sizeAttenuation: true
+    }));
+
+    /* line segments between adjacent nodes */
+    var edges = [];
+    for (ix = 0; ix < NX; ix++) for (iy = 0; iy < NY; iy++) for (iz = 0; iz < NZ; iz++) {
+      if (ix + 1 < NX) edges.push(nodeId(ix, iy, iz), nodeId(ix + 1, iy, iz));
+      if (iy + 1 < NY) edges.push(nodeId(ix, iy, iz), nodeId(ix, iy + 1, iz));
+      if (iz + 1 < NZ) edges.push(nodeId(ix, iy, iz), nodeId(ix, iy, iz + 1));
+      /* sparse diagonals = truss bracing */
+      if (ix + 1 < NX && iy + 1 < NY && (ix + iy + iz) % 3 === 0) edges.push(nodeId(ix, iy, iz), nodeId(ix + 1, iy + 1, iz));
+    }
+    var linGeo = new THREE.BufferGeometry();
+    var linPos = new Float32Array(edges.length * 3);
+    linGeo.setAttribute('position', new THREE.BufferAttribute(linPos, 3));
+    var lines = new THREE.LineSegments(linGeo, new THREE.LineBasicMaterial({
+      color: 0x35506e, transparent: true, opacity: 0.42
+    }));
+
+    var group = new THREE.Group();
+    group.add(lines); group.add(pts); group.add(anchors);
+    group.rotation.x = 0.18;
+    scene.add(group);
+
+    function resize() {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+    }
+
+    var pointerX = 0, pointerY = 0;
+    addEventListener('mousemove', function (e) {
+      pointerX = (e.clientX / innerWidth)  * 2 - 1;
+      pointerY = (e.clientY / innerHeight) * 2 - 1;
+    }, { passive: true });
+
+    /* render only while hero is on screen */
+    var heroVisible = true;
+    new IntersectionObserver(function (en) { heroVisible = en[0].isIntersecting; }, { threshold: 0 })
+      .observe(canvas.parentElement);
+
+    var clock = new THREE.Clock();
+    function tick() {
+      requestAnimationFrame(tick);
+      if (!heroVisible) return;
+      resize();
+      var t = clock.getElapsedTime();
+
+      /* breathing wave through the lattice */
+      var amp = reduceMotion ? 0 : 0.34;
+      for (var i = 0; i < nodeCount; i++) {
+        var bx = basePos[i * 3], by = basePos[i * 3 + 1], bz = basePos[i * 3 + 2];
+        var o = Math.sin(t * 0.7 + bx * 0.45 + bz * 0.3) * amp;
+        ptsPos[i * 3] = bx; ptsPos[i * 3 + 1] = by + o; ptsPos[i * 3 + 2] = bz;
+      }
+      ptsGeo.attributes.position.needsUpdate = true;
+
+      for (var e2 = 0; e2 < edges.length; e2++) {
+        var n = edges[e2];
+        linPos[e2 * 3] = ptsPos[n * 3]; linPos[e2 * 3 + 1] = ptsPos[n * 3 + 1]; linPos[e2 * 3 + 2] = ptsPos[n * 3 + 2];
+      }
+      linGeo.attributes.position.needsUpdate = true;
+
+      for (var a2 = 0; a2 < anchorIdx.length; a2++) {
+        var an = anchorIdx[a2];
+        ancPos[a2 * 3] = ptsPos[an * 3]; ancPos[a2 * 3 + 1] = ptsPos[an * 3 + 1]; ancPos[a2 * 3 + 2] = ptsPos[an * 3 + 2];
+      }
+      ancGeo.attributes.position.needsUpdate = true;
+
+      if (!reduceMotion) group.rotation.y = t * 0.05 + pointerX * 0.14;
+      group.rotation.x = 0.18 + pointerY * 0.08;
+      camera.position.x += (pointerX * 0.8 - camera.position.x) * 0.04;
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+    }
+    tick();
+  })();
+
+  /* ============ GSAP SCROLL ENGINE ============ */
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (!reduceMotion) {
+      /* hero text mask reveal */
+      gsap.to('#hero-headline .reveal-line > span', {
+        y: 0, duration: 1.1, ease: 'power4.out', stagger: 0.12, delay: 0.25
+      });
+      gsap.from('#hero-eyebrow', { opacity: 0, y: 12, duration: .8, delay: .15, ease: 'power2.out' });
+      gsap.from('#hero-stats > div', { opacity: 0, y: 28, duration: .9, stagger: .14, delay: .9, ease: 'power3.out' });
+
+      /* generic fade-up reveals */
+      gsap.utils.toArray('[data-reveal]').forEach(function (el) {
+        gsap.from(el, {
+          opacity: 0, y: 36, duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 86%' }
+        });
+      });
+
+      /* heading line-mask splits */
+      gsap.utils.toArray('[data-split]').forEach(function (h) {
+        var raw = h.innerHTML.trim().split(/\s+/);
+        h.innerHTML = raw.map(function (w) {
+          return '<span class="inline-block overflow-hidden align-bottom"><span class="inline-block will-change-transform" style="transform:translateY(112%)">' + w + '</span></span>';
+        }).join(' ');
+        gsap.to(h.querySelectorAll(':scope > span > span'), {
+          y: 0, duration: .9, ease: 'power4.out', stagger: .06,
+          scrollTrigger: { trigger: h, start: 'top 85%' }
+        });
+      });
+
+      /* segment cards stagger in */
+      gsap.from('.seg-card', {
+        opacity: 0, y: 40, duration: .8, ease: 'power3.out', stagger: .09,
+        scrollTrigger: { trigger: '#segment-row', start: 'top 82%' }
+      });
+    } else {
+      document.querySelectorAll('#hero-headline .reveal-line > span').forEach(function (s) { s.style.transform = 'none'; });
+    }
+
+    /* counters (run even with reduced motion, instantly) */
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      var target = parseInt(el.getAttribute('data-count'), 10);
+      var pad = parseInt(el.getAttribute('data-pad') || '0', 10);
+      var fmt = function (v) { var s = String(Math.round(v)); while (s.length < pad) s = '0' + s; return s; };
+      if (reduceMotion) { el.textContent = fmt(target); return; }
+      var obj = { v: 0 };
+      gsap.to(obj, {
+        v: target, duration: 1.6, ease: 'power2.out', delay: 1.0,
+        onUpdate: function () { el.textContent = fmt(obj.v); },
+        scrollTrigger: { trigger: el, start: 'top 95%' }
+      });
+    });
+  }
+
+  /* ============ REGISTRY FILTER ============ */
+  var tabs = document.querySelectorAll('#registry-tabs .reg-tab');
+  var rows = document.querySelectorAll('#registry-table .reg-row');
+  var empty = document.getElementById('registry-empty');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      var f = tab.getAttribute('data-filter');
+      var visible = 0;
+      rows.forEach(function (row) {
+        var show = (f === 'all') || (row.getAttribute('data-emirate') === f);
+        row.classList.toggle('is-hidden', !show);
+        if (show) visible++;
+      });
+      empty.classList.toggle('hidden', visible > 0);
+      if (window.gsap && !reduceMotion) {
+        gsap.fromTo('#registry-table .reg-row:not(.is-hidden)',
+          { opacity: 0, x: -14 },
+          { opacity: 1, x: 0, duration: .45, stagger: .05, ease: 'power2.out', overwrite: true });
+      }
+    });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var KEY='adsd_reviews_v1';
+  var SEED=[
+    {name:'MBS — Meemar Building System',company:'Main Contractor',rating:5,text:'ADSD erected our Hamriyah warehouse frame ahead of schedule and never once handed the work to a sub-contractor. Their property manager knew every weld on site.',date:'2026-05-12'},
+    {name:'Lamprell',company:'Site Engineer',rating:5,text:'In-house crews, in-house accountability. We never chased a third party for a fix — ADSD owned every task on the asset.',date:'2026-04-28'},
+    {name:'Al Ghurair Iron & Steel',company:'Facilities Manager',rating:5,text:'Their maintenance division keeps our ICAD facility running — scheduled, monitored and verified by people who actually answer the phone.',date:'2026-03-09'}
+  ];
+  function load(){try{var r=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(r))return r;}catch(e){}return SEED.slice();}
+  function save(r){try{localStorage.setItem(KEY,JSON.stringify(r));}catch(e){}}
+  var reviews=load();
+  var $=function(s){return document.querySelector(s);};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function stars(n){var s='';for(var i=1;i<=5;i++){s+=i<=n?'★':'☆';}return s;}
+  function fmtDate(d){try{return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});}catch(e){return d;}}
+  function initials(name){return name.trim().split(/\s+/).slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();}
+  function render(){
+    var n=reviews.length;
+    var avg=n?reviews.reduce(function(a,b){return a+b.rating;},0)/n:0;
+    $('#rv-avg').textContent=avg.toFixed(1);
+    $('#rv-avg-stars').textContent=stars(Math.round(avg));
+    $('#rv-count').textContent=n+' review'+(n===1?'':'s');
+    var bars='';
+    for(var s=5;s>=1;s--){
+      var c=reviews.filter(function(r){return r.rating===s;}).length;
+      var pct=n?Math.round(c/n*100):0;
+      bars+='<div class="flex items-center gap-3"><span class="font-mono text-[10px] text-tidim w-3">'+s+'</span><div class="flex-1 h-1.5 bg-ink overflow-hidden"><div class="h-full bg-steel" style="width:'+pct+'%"></div></div><span class="font-mono text-[10px] text-tidim w-6 text-right">'+c+'</span></div>';
+    }
+    $('#rv-bars').innerHTML=bars;
+    $('#rv-list').innerHTML=reviews.map(function(r){
+      return '<figure class="bg-ink2 p-7 flex flex-col">'+
+        '<div class="flex items-center gap-3 mb-4">'+
+          '<div class="w-10 h-10 flex items-center justify-center bg-ink border border-line font-display text-sm shrink-0">'+esc(initials(r.name))+'</div>'+
+          '<div><div class="font-display text-sm uppercase leading-tight">'+esc(r.name)+'</div>'+(r.company?'<div class="text-xs text-tidim">'+esc(r.company)+'</div>':'')+'</div>'+
+        '</div>'+
+        '<div class="text-steeltx text-lg tracking-tight mb-3">'+stars(r.rating)+'</div>'+
+        '<blockquote class="text-sm leading-relaxed text-ti/90 flex-1">'+esc(r.text)+'</blockquote>'+
+        '<div class="mt-5 font-mono text-[10px] tracking-[.16em] uppercase text-tidim">'+fmtDate(r.date)+'</div>'+
+      '</figure>';
+    }).join('');
+  }
+  var cur=0;
+  var wrap=$('#rv-stars-input');
+  var els=wrap?Array.prototype.slice.call(wrap.children):[];
+  function paint(v){els.forEach(function(el){var val=+el.dataset.val;el.classList.toggle('text-steeltx',val<=v);el.classList.toggle('text-line',val>v);});}
+  els.forEach(function(el){
+    el.addEventListener('mouseenter',function(){paint(+el.dataset.val);});
+    el.addEventListener('click',function(){cur=+el.dataset.val;paint(cur);});
+  });
+  if(wrap)wrap.addEventListener('mouseleave',function(){paint(cur);});
+  var form=$('#rv-form');
+  if(form)form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var fd=new FormData(form);
+    var name=(fd.get('name')||'').trim();
+    var text=(fd.get('text')||'').trim();
+    var msg=$('#rv-msg');
+    if(!name||!text){msg.textContent='Please add your name and review.';return;}
+    if(!cur){msg.textContent='Please pick a star rating.';return;}
+    reviews.unshift({name:name,company:(fd.get('company')||'').trim(),rating:cur,text:text,date:new Date().toISOString()});
+    save(reviews);render();
+    form.reset();cur=0;paint(0);
+    msg.textContent='Thank you — your review is published.';
+    setTimeout(function(){msg.textContent='';},4000);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
