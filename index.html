@@ -8,6 +8,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"></link>
@@ -84,13 +85,41 @@ tailwind.config = {
     .seg-card .seg-title-vert { transition: opacity .3s; }
   }
   .seg-card { position: relative; background: #121315; border: 1px solid #26282C; overflow: hidden; }
+  /* background image layer (taller than card to allow parallax headroom) */
+  .seg-media { position: absolute; left: 0; right: 0; top: -10%; height: 120%; z-index: 0; overflow: hidden; will-change: transform; }
+  .seg-img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
+    transform: scale(1); will-change: transform;
+    filter: grayscale(.18) contrast(1.03);
+  }
+  /* dark readability overlay (~68%), lightens on hover */
+  .seg-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(13,13,13,.55) 0%, rgba(13,13,13,.72) 60%, rgba(13,13,13,.82) 100%),
+      rgba(13,13,13,.20);
+    transition: opacity .5s;
+    opacity: 1;
+  }
+  .seg-card:hover::before { opacity: .78; }
   .seg-card::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(160deg, rgba(77,163,255,.10), rgba(77,163,255,0) 45%);
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(160deg, rgba(77,163,255,.14), rgba(77,163,255,0) 48%);
     opacity: 0; transition: opacity .5s;
   }
   .seg-card:hover::after { opacity: 1; }
   .seg-card:hover { border-color: rgba(77,163,255,.45); }
+  /* keep content above the image + overlays */
+  .seg-card > .flex, .seg-card > .seg-body { position: relative; z-index: 2; }
+  .seg-card h3, .seg-card .seg-body p { text-shadow: 0 2px 14px rgba(0,0,0,.55); }
+  .seg-card { cursor: pointer; text-decoration: none; display: block; }
+  .seg-card:focus-visible { outline: 2px solid #4DA3FF; outline-offset: -2px; }
+  .seg-explore {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #4DA3FF;
+  }
+  .seg-explore svg { transition: transform .3s; }
+  .seg-card:hover .seg-explore svg { transform: translateX(4px); }
 
   /* ---------- registry ---------- */
   .reg-row { border-bottom: 1px solid #26282C; transition: background-color .25s, padding-left .25s; }
@@ -98,6 +127,295 @@ tailwind.config = {
   .reg-tab { transition: color .25s, border-color .25s, background-color .25s; }
   .reg-tab.is-active { color: #0D0D0D; background: #4DA3FF; border-color: #4DA3FF; }
   .reg-row.is-hidden { display: none; }
+
+  /* ---------- nav dropdown ---------- */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown-menu {
+    position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%);
+    min-width: 200px; background: #121315; border: 1px solid #26282C;
+    padding: 6px 0; opacity: 0; visibility: hidden;
+    transition: opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1);
+    transform: translateX(-50%) translateY(-6px);
+    z-index: 60;
+  }
+  .nav-dropdown-menu::before {
+    content: ''; position: absolute; top: -12px; left: 0; right: 0; height: 12px;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown.is-open .nav-dropdown-menu {
+    opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown-menu a {
+    display: block; padding: 10px 20px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: #9BA1A8; transition: color .2s, background-color .2s;
+  }
+  .nav-dropdown-menu a:hover { color: #F2F3F5; background: rgba(77,163,255,.06); }
+  .nav-dropdown-menu a.is-active { color: #4DA3FF; background: rgba(77,163,255,.08); }
+  .nav-dropdown-menu.wide { min-width: 280px; }
+  .nav-dropdown button svg { transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  .nav-dropdown:hover button svg, .nav-dropdown.is-open button svg { transform: rotate(180deg); }
+  .nav-trigger.is-active { color: #4DA3FF; }
+
+  /* ---------- mobile nav ---------- */
+  #mobile-menu {
+    position: fixed; inset: 0; z-index: 55; background: rgba(13,13,13,.96); backdrop-filter: blur(16px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s;
+  }
+  #mobile-menu.is-open { opacity: 1; visibility: visible; }
+  #mobile-menu a, #mobile-menu button {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: .22em; text-transform: uppercase;
+    color: #9BA1A8; padding: 14px 20px; transition: color .2s;
+  }
+  #mobile-menu a:hover, #mobile-menu button:hover { color: #F2F3F5; }
+  .mobile-sub { padding-left: 32px !important; font-size: 11px !important; color: #4DA3FF !important; }
+  .mobile-sub.is-active { background: rgba(77,163,255,.12); border-radius: 8px; }
+  .mobile-toggle svg { transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  .mobile-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .mobile-toggle.is-active { color: #4DA3FF; }
+  #hamburger span {
+    display: block; width: 22px; height: 1.5px; background: #F2F3F5; transition: transform .3s, opacity .3s;
+  }
+  #hamburger.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  #hamburger.is-open span:nth-child(2) { opacity: 0; }
+  #hamburger.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* ---------- our products ---------- */
+  .product-card {
+    position: relative; display: flex; flex-direction: column;
+    border: 1px solid #26282C; background: #121315; border-radius: 18px; overflow: hidden;
+    transition: border-color .4s, transform .45s cubic-bezier(.22,1,.36,1), box-shadow .4s;
+  }
+  .product-card:hover { border-color: rgba(77,163,255,.42); transform: translateY(-6px); box-shadow: 0 26px 60px rgba(0,0,0,.5); }
+  .product-media {
+    position: relative; aspect-ratio: 4 / 3; overflow: hidden;
+    background: radial-gradient(120% 120% at 50% 20%, #1c1e22 0%, #0f1012 70%);
+    border-bottom: 1px solid #26282C;
+  }
+  .product-media svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    transition: transform .7s cubic-bezier(.22,1,.36,1);
+    will-change: transform;
+  }
+  .product-card:hover .product-media svg { transform: scale(1.09); }
+  .product-media::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(160deg, rgba(77,163,255,.10), rgba(77,163,255,0) 50%);
+    opacity: 0; transition: opacity .5s;
+  }
+  .product-card:hover .product-media::after { opacity: 1; }
+  .product-tag {
+    position: absolute; top: 14px; left: 14px; z-index: 2;
+    font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+    color: #9BA1A8; background: rgba(13,13,13,.7); border: 1px solid #26282C;
+    padding: 5px 10px; border-radius: 6px; backdrop-filter: blur(6px);
+  }
+  .product-body { padding: 26px 26px 28px; display: flex; flex-direction: column; flex: 1; }
+  .product-enquire {
+    align-self: flex-start; margin-top: 22px;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: #4DA3FF; border: 1px solid rgba(77,163,255,.4); border-radius: 8px; padding: 10px 18px;
+    text-decoration: none; transition: background .3s, color .3s, border-color .3s, gap .3s;
+  }
+  .product-enquire:hover { background: #4DA3FF; color: #0D0D0D; border-color: #4DA3FF; gap: 12px; }
+  .product-enquire svg { transition: transform .3s; }
+  .product-enquire:hover svg { transform: translateX(3px); }
+
+  /* view more products — secondary CTA */
+  .view-more-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+    color: #F2F3F5; background: transparent;
+    border: 1px solid #26282C; border-radius: 12px; padding: 16px 34px; cursor: pointer;
+    transition: border-color .4s, color .35s, background .4s, transform .3s cubic-bezier(.22,1,.36,1);
+    position: relative; overflow: hidden;
+  }
+  .view-more-btn:hover { border-color: rgba(77,163,255,.55); color: #4DA3FF; transform: translateY(-2px); }
+  .view-more-btn .vm-arrow {
+    display: inline-flex; transition: transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  .view-more-btn:hover .vm-arrow { transform: translateX(5px); }
+  .view-more-btn.is-nudge { animation: vm-nudge .5s ease; }
+  @keyframes vm-nudge {
+    0%,100% { transform: translateY(-2px) translateX(0); }
+    25% { transform: translateY(-2px) translateX(-4px); }
+    75% { transform: translateY(-2px) translateX(4px); }
+  }
+  .view-more-note {
+    margin-top: 14px; font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; color: #9BA1A8; opacity: 0; transition: opacity .4s;
+  }
+  .view-more-note.is-visible { opacity: 1; }
+
+  /* ---------- why choose us ---------- */
+  .why-card {
+    position: relative; border: 1px solid #26282C; background: #121315;
+    border-radius: 16px; padding: 34px 30px; overflow: hidden;
+    transition: border-color .4s, transform .45s cubic-bezier(.22,1,.36,1), box-shadow .4s;
+  }
+  .why-card::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 90% at 100% 0%, rgba(77,163,255,.08), rgba(77,163,255,0) 55%);
+    opacity: 0; transition: opacity .45s;
+  }
+  .why-card:hover { border-color: rgba(77,163,255,.4); transform: translateY(-6px); box-shadow: 0 22px 50px rgba(0,0,0,.45); }
+  .why-card:hover::before { opacity: 1; }
+  .why-icon {
+    width: 52px; height: 52px; border-radius: 12px; margin-bottom: 22px;
+    background: rgba(77,163,255,.07); border: 1px solid rgba(77,163,255,.16);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .4s, transform .45s cubic-bezier(.34,1.56,.64,1), border-color .4s;
+  }
+  .why-card:hover .why-icon { background: rgba(77,163,255,.14); border-color: rgba(77,163,255,.4); transform: translateY(-2px) rotate(-4deg) scale(1.06); }
+  .why-icon svg { transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+  .why-card:hover .why-icon svg { transform: scale(1.08); }
+  .why-index {
+    position: absolute; top: 26px; right: 28px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .18em;
+    color: #26282C; transition: color .4s;
+  }
+  .why-card:hover .why-index { color: #4DA3FF; }
+
+  /* ---------- contact section ---------- */
+  #contact-section {
+    background: #0D0D0D;
+  }
+  .contact-info-card {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 20px 22px; border: 1px solid #26282C; background: #121315;
+    transition: border-color .3s, background .3s, transform .3s cubic-bezier(.22,1,.36,1);
+  }
+  .contact-info-card:hover { border-color: rgba(77,163,255,.4); background: #16181b; transform: translateX(4px); }
+  .contact-icon-wrap {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px;
+    background: rgba(77,163,255,.08); border: 1px solid rgba(77,163,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .3s, transform .3s;
+  }
+  .contact-info-card:hover .contact-icon-wrap { background: rgba(77,163,255,.15); transform: scale(1.08); }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #9BA1A8;
+  }
+  .trust-check {
+    width: 20px; height: 20px; border-radius: 50%; background: rgba(77,163,255,.1); border: 1px solid rgba(77,163,255,.25);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  /* glassmorphism form card */
+  .contact-form-card {
+    background: rgba(18,19,21,.75); border: 1px solid rgba(255,255,255,.07);
+    border-radius: 24px; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 32px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
+    padding: 44px;
+  }
+  @media (max-width: 640px) { .contact-form-card { padding: 28px 22px; border-radius: 16px; } }
+
+  .contact-field { position: relative; }
+  .contact-field label {
+    display: block; font-family: "IBM Plex Mono", monospace; font-size: 10px;
+    letter-spacing: .22em; text-transform: uppercase; color: #9BA1A8; margin-bottom: 8px;
+    transition: color .25s;
+  }
+  .contact-field:focus-within label { color: #4DA3FF; }
+  .contact-input {
+    width: 100%; background: rgba(13,13,13,.6); border: 1px solid #26282C; border-radius: 10px;
+    padding: 14px 18px; color: #F2F3F5; font-family: "Archivo", sans-serif; font-size: 14px;
+    outline: none; transition: border-color .25s, background .25s, box-shadow .25s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .contact-input::placeholder { color: rgba(155,161,168,.4); }
+  .contact-input:focus {
+    border-color: rgba(77,163,255,.55); background: rgba(13,13,13,.9);
+    box-shadow: 0 0 0 3px rgba(77,163,255,.1);
+  }
+  select.contact-input { cursor: pointer; }
+  select.contact-input option { background: #121315; color: #F2F3F5; }
+  textarea.contact-input { resize: none; }
+
+  .contact-submit-btn {
+    width: 100%; padding: 16px 28px; border: none; border-radius: 12px; cursor: pointer;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+    color: #0D0D0D; font-weight: 600;
+    background: linear-gradient(135deg, #4DA3FF 0%, #1E7FE0 50%, #4DA3FF 100%);
+    background-size: 200% 200%; background-position: 0% 50%;
+    box-shadow: 0 4px 24px rgba(77,163,255,.3), 0 0 0 1px rgba(77,163,255,.2) inset;
+    transition: background-position .5s ease, box-shadow .3s, transform .25s cubic-bezier(.22,1,.36,1);
+    position: relative; overflow: hidden;
+  }
+  .contact-submit-btn:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 8px 36px rgba(77,163,255,.45), 0 0 0 1px rgba(77,163,255,.3) inset;
+    transform: translateY(-2px);
+  }
+  .contact-submit-btn:active { transform: translateY(0); }
+  .contact-submit-btn .btn-arrow {
+    display: inline-block; margin-left: 8px; transition: transform .3s;
+  }
+  .contact-submit-btn:hover .btn-arrow { transform: translateX(5px); }
+
+  /* ---------- floating contact widget ---------- */
+  #fab-widget {
+    position: fixed; bottom: 28px; right: 28px; z-index: 100;
+    display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+  }
+  .fab-btn {
+    position: relative; display: flex; align-items: center; gap: 0;
+    height: 52px; min-width: 52px; border-radius: 26px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(18,19,21,.72);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 6px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04) inset;
+    padding: 0 15px 0 14px;
+    cursor: pointer; overflow: hidden;
+    transition: gap .35s cubic-bezier(.22,1,.36,1), padding .35s cubic-bezier(.22,1,.36,1),
+                box-shadow .3s, border-color .3s, transform .3s cubic-bezier(.22,1,.36,1);
+    text-decoration: none;
+    animation: fab-float 4s ease-in-out infinite;
+  }
+  .fab-btn:nth-child(1) { animation-delay: 0s; }
+  .fab-btn:nth-child(2) { animation-delay: .6s; }
+  .fab-btn:nth-child(3) { animation-delay: 1.2s; }
+  @keyframes fab-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  .fab-btn .fab-icon {
+    width: 24px; height: 24px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .3s cubic-bezier(.22,1,.36,1);
+  }
+  .fab-btn .fab-label {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; white-space: nowrap; color: #F2F3F5;
+    max-width: 0; opacity: 0; overflow: hidden;
+    transition: max-width .4s cubic-bezier(.22,1,.36,1), opacity .3s .05s;
+  }
+  @media (pointer: fine) {
+    .fab-btn:hover { gap: 10px; padding-right: 20px; transform: translateY(-3px) scale(1.04); animation-play-state: paused; }
+    .fab-btn:hover .fab-label { max-width: 140px; opacity: 1; }
+    .fab-btn:hover .fab-icon { transform: scale(1.12); }
+  }
+  @media (pointer: coarse), (max-width: 1023px) {
+    .fab-btn { gap: 10px; padding-right: 18px; }
+    .fab-btn .fab-label { max-width: 140px; opacity: 1; }
+    #fab-widget { bottom: 20px; right: 16px; }
+  }
+  .fab-btn.fab-whatsapp { border-color: rgba(37,211,102,.35); }
+  .fab-btn.fab-whatsapp:hover { border-color: rgba(37,211,102,.7); box-shadow: 0 6px 32px rgba(37,211,102,.2), 0 0 0 1px rgba(37,211,102,.12) inset; }
+  .fab-btn.fab-call { border-color: rgba(242,243,245,.12); }
+  .fab-btn.fab-call:hover { border-color: rgba(242,243,245,.25); box-shadow: 0 6px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(242,243,245,.08) inset; }
+  .fab-btn.fab-enquire { border-color: rgba(77,163,255,.35); }
+  .fab-btn.fab-enquire:hover { border-color: rgba(77,163,255,.7); box-shadow: 0 6px 32px rgba(77,163,255,.18), 0 0 0 1px rgba(77,163,255,.12) inset; }
+
+  .fab-btn .fab-ripple {
+    position: absolute; border-radius: 50%; background: rgba(255,255,255,.18);
+    transform: scale(0); animation: fab-ripple-anim .55s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes fab-ripple-anim { to { transform: scale(4); opacity: 0; } }
 
   /* ---------- misc ---------- */
   .hairline { height: 1px; background: #26282C; }
@@ -149,19 +467,79 @@ tailwind.config = {
       <span class="hidden md:inline font-mono text-[10px] tracking-[.22em] text-tidim uppercase">Steel Technical Services Contracting L.L.C</span>
     </a>
     <nav class="hidden lg:flex items-center gap-8 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">
-      <a href="#enterprise" class="hover:text-ti transition-colors" data-hover="1">Enterprise</a>
-      <a href="#segments" class="hover:text-ti transition-colors" data-hover="1">Segments</a>
-      <a href="#maintenance" class="hover:text-ti transition-colors" data-hover="1">Maintenance</a>
-      <a href="#registry" class="hover:text-ti transition-colors" data-hover="1">Registry</a>
+      <div class="nav-dropdown">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1">
+          Company
+          <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#enterprise" data-hover="1">About Us</a>
+          <a href="#mission-vision" data-hover="1">Mission &amp; Vision</a>
+          <a href="#why-choose-us" data-hover="1">Why Choose Us</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="services">
+          Services
+          <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+        </button>
+        <div class="nav-dropdown-menu wide">
+          <a href="structural-steel-fabrication.html" data-hover="1" data-page="structural-steel-fabrication" data-page-group="services">Structural Steel Fabrication &amp; Installation</a>
+          <a href="miscellaneous-metal-work.html" data-hover="1" data-page="miscellaneous-metal-work" data-page-group="services">Miscellaneous Metal Work</a>
+          <a href="supply-services.html" data-hover="1" data-page="supply-services" data-page-group="services">Supply Services</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="products">
+          Products
+          <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="mopping-sink.html" data-hover="1" data-page="mopping-sink" data-page-group="products">Mopping Sink</a>
+          <a href="wall-mounted-shelf.html" data-hover="1" data-page="wall-mounted-shelf" data-page-group="products">Wall Mounted Shelf</a>
+          <a href="triple-bowl-sink.html" data-hover="1" data-page="triple-bowl-sink" data-page-group="products">Triple Bowl Sink</a>
+        </div>
+      </div>
+      <a href="#registry" class="hover:text-ti transition-colors" data-hover="1">Projects</a>
       <a href="#reviews" class="hover:text-ti transition-colors" data-hover="1">Reviews</a>
-      <a href="#regulatory" class="hover:text-ti transition-colors" data-hover="1">Regulatory</a>
+      <a href="#regulatory" class="hover:text-ti transition-colors" data-hover="1">Contact</a>
     </nav>
-    <a href="tel:+971569968611" data-hover="1"
-       class="font-mono text-[11px] tracking-[.14em] uppercase border border-steel/60 text-steel px-4 py-2 hover:bg-steel hover:text-ink transition-colors">
-      +971 56 996 8611
-    </a>
+    <div class="flex items-center gap-4">
+      <a href="tel:+971569968611" data-hover="1"
+         class="font-mono text-[11px] tracking-[.14em] uppercase border border-steel/60 text-steel px-4 py-2 hover:bg-steel hover:text-ink transition-colors">
+        +971 56 996 8611
+      </a>
+      <button id="hamburger" class="lg:hidden flex flex-col gap-[5px] p-2" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </header>
+
+<!-- ================= MOBILE MENU ================= -->
+<div id="mobile-menu">
+  <button class="mobile-toggle flex items-center gap-2" data-toggle="company" aria-expanded="false">Company
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+  </button>
+  <a href="#enterprise" class="mobile-sub" data-group="company" style="display:none">About Us</a>
+  <a href="#mission-vision" class="mobile-sub" data-group="company" style="display:none">Mission &amp; Vision</a>
+  <a href="#why-choose-us" class="mobile-sub" data-group="company" style="display:none">Why Choose Us</a>
+  <button class="mobile-toggle flex items-center gap-2" data-toggle="services" aria-expanded="false">Services
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+  </button>
+  <a href="structural-steel-fabrication.html" class="mobile-sub" data-group="services" data-page="structural-steel-fabrication" data-page-group="services" style="display:none">Structural Steel Fabrication &amp; Installation</a>
+  <a href="miscellaneous-metal-work.html" class="mobile-sub" data-group="services" data-page="miscellaneous-metal-work" data-page-group="services" style="display:none">Miscellaneous Metal Work</a>
+  <a href="supply-services.html" class="mobile-sub" data-group="services" data-page="supply-services" data-page-group="services" style="display:none">Supply Services</a>
+  <button class="mobile-toggle flex items-center gap-2" data-toggle="products" aria-expanded="false">Products
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
+  </button>
+  <a href="mopping-sink.html" class="mobile-sub" data-group="products" data-page="mopping-sink" data-page-group="products" style="display:none">Mopping Sink</a>
+  <a href="wall-mounted-shelf.html" class="mobile-sub" data-group="products" data-page="wall-mounted-shelf" data-page-group="products" style="display:none">Wall Mounted Shelf</a>
+  <a href="triple-bowl-sink.html" class="mobile-sub" data-group="products" data-page="triple-bowl-sink" data-page-group="products" style="display:none">Triple Bowl Sink</a>
+  <a href="#registry">Projects</a>
+  <a href="#reviews">Reviews</a>
+  <a href="#regulatory">Contact</a>
+</div>
 
 <!-- ================= HERO ================= -->
 <section id="top" class="relative min-h-screen flex flex-col justify-end overflow-hidden" data-screen-label="Hero">
@@ -251,20 +629,63 @@ tailwind.config = {
   </div>
 </section>
 
+<!-- ================= MISSION & VISION ================= -->
+<section id="mission-vision" class="relative py-28 lg:py-36 bg-ink2 border-y border-line" data-screen-label="Mission &amp; Vision">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 lg:gap-16">
+    <div class="lg:col-span-6">
+      <p class="eyebrow mb-6" data-reveal="1">02 — Mission &amp; Vision</p>
+      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-reveal="1">Purpose-driven <span class="text-steel">engineering.</span></h2>
+      <div class="mt-10 hairline" data-reveal="1"></div>
+      <div class="mt-10" data-reveal="1">
+        <p class="font-mono text-[11px] tracking-[.22em] uppercase text-steel mb-4">Our Mission</p>
+        <p class="text-lg leading-relaxed text-tidim max-w-[54ch]">
+          To deliver exceptional-quality steel fabrication and industrial construction services through
+          100% in-house execution — ensuring absolute accountability, precision engineering, and on-time
+          delivery across every project we undertake.
+        </p>
+      </div>
+    </div>
+    <div class="lg:col-span-6 lg:pt-20">
+      <div data-reveal="1">
+        <p class="font-mono text-[11px] tracking-[.22em] uppercase text-safety mb-4">Our Vision</p>
+        <p class="text-lg leading-relaxed text-tidim max-w-[54ch]">
+          To be the most trusted and self-reliant steel technical services contractor in the UAE —
+          setting the benchmark for prefabricated construction through advanced engineering,
+          dedicated craftsmanship, and zero-compromise quality standards.
+        </p>
+      </div>
+      <div class="mt-12 grid grid-cols-2 gap-6" data-reveal="1">
+        <div class="border border-line bg-ink p-6">
+          <div class="font-display text-3xl text-steel">Zero</div>
+          <p class="mt-2 font-mono text-[10px] tracking-[.16em] uppercase text-tidim">Sub-contracting policy</p>
+        </div>
+        <div class="border border-line bg-ink p-6">
+          <div class="font-display text-3xl text-safety">100%</div>
+          <p class="mt-2 font-mono text-[10px] tracking-[.16em] uppercase text-tidim">Accountability on every asset</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= INDUSTRIAL SEGMENTS ================= -->
 <section id="segments" class="relative py-28 lg:py-36 bg-ink2 border-y border-line" data-screen-label="Industrial Segments">
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
     <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
       <div>
-        <p class="eyebrow mb-6" data-reveal="1">02 — Industrial Segments</p>
-        <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Six disciplines. One contractor.</h2>
+        <p class="eyebrow mb-6" data-reveal="1">03 — Services</p>
+        <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Three disciplines. One contractor.</h2>
       </div>
       <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Hover a column to expand its scope of work</p>
     </div>
 
     <div id="segment-row" data-reveal="1">
 
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+      <a href="structural-steel-fabrication.html" class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1" aria-label="Explore Structural Steel Fabrication &amp; Installation service">
+        <div class="seg-media" aria-hidden="true">
+          <img class="seg-img" loading="lazy" decoding="async" alt=""
+               src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&amp;fit=crop&amp;w=1200&amp;q=70&amp;fm=webp" />
+        </div>
         <div class="flex lg:flex-col gap-4">
           <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—01</span>
           <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Structural Steel Fabrication &amp; Installation</h3>
@@ -272,10 +693,15 @@ tailwind.config = {
         <div class="seg-body mt-6 hidden lg:block">
           <div class="hairline mb-4"></div>
           <p class="text-sm text-tidim leading-relaxed">Full-cycle fabrication and erection of primary steel structures for warehouses, industrial sheds and prefabricated buildings across the UAE.</p>
+          <span class="seg-explore">Explore Service <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </div>
-      </article>
+      </a>
 
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+      <a href="miscellaneous-metal-work.html" class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1" aria-label="Explore Miscellaneous Metal Work service">
+        <div class="seg-media" aria-hidden="true">
+          <img class="seg-img" loading="lazy" decoding="async" alt=""
+               src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&amp;fit=crop&amp;w=1200&amp;q=70&amp;fm=webp" />
+        </div>
         <div class="flex lg:flex-col gap-4">
           <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—02</span>
           <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Miscellaneous Metal Work</h3>
@@ -283,95 +709,258 @@ tailwind.config = {
         <div class="seg-body mt-6 hidden lg:block">
           <div class="hairline mb-4"></div>
           <p class="text-sm text-tidim leading-relaxed">Handrails, aluminium louvers, car-parking sheds and substation chequer plates — precision metal work engineered to specification.</p>
+          <span class="seg-explore">Explore Service <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </div>
-      </article>
+      </a>
 
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
+      <a href="supply-services.html" class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1" aria-label="Explore Supply Services service">
+        <div class="seg-media" aria-hidden="true">
+          <img class="seg-img" loading="lazy" decoding="async" alt=""
+               src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&amp;fit=crop&amp;w=1200&amp;q=70&amp;fm=webp" />
+        </div>
         <div class="flex lg:flex-col gap-4">
           <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—03</span>
-          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Equipment Installation</h3>
-        </div>
-        <div class="seg-body mt-6 hidden lg:block">
-          <div class="hairline mb-4"></div>
-          <p class="text-sm text-tidim leading-relaxed">Rigging, setting and alignment of industrial process equipment, executed by our own certified in-house crews.</p>
-        </div>
-      </article>
-
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
-        <div class="flex lg:flex-col gap-4">
-          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—04</span>
-          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Pipe Fabrication &amp; Inline Equipment</h3>
-        </div>
-        <div class="seg-body mt-6 hidden lg:block">
-          <div class="hairline mb-4"></div>
-          <p class="text-sm text-tidim leading-relaxed">Pipe fabrication and installation, including inline equipment integration for industrial process facilities.</p>
-        </div>
-      </article>
-
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
-        <div class="flex lg:flex-col gap-4">
-          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—05</span>
-          <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Tanks Installation</h3>
-        </div>
-        <div class="seg-body mt-6 hidden lg:block">
-          <div class="hairline mb-4"></div>
-          <p class="text-sm text-tidim leading-relaxed">Installation of storage tanks and silo structures — including elevated platforms, access stairs and supporting steelwork.</p>
-        </div>
-      </article>
-
-      <article class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1">
-        <div class="flex lg:flex-col gap-4">
-          <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—06</span>
           <h3 class="font-display text-xl lg:text-2xl uppercase leading-tight lg:max-w-[12ch]">Supply Services</h3>
         </div>
         <div class="seg-body mt-6 hidden lg:block">
           <div class="hairline mb-4"></div>
           <p class="text-sm text-tidim leading-relaxed">Anchor bolts, fasteners and certified manpower supply — reach our sales staff by phone, fax or e-mail for a free quote.</p>
+          <span class="seg-explore">Explore Service <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </div>
+      </a>
+
+    </div>
+
+    <!-- View More Services -->
+    <div class="mt-16 flex flex-col items-center" data-reveal="1">
+      <button id="view-more-services" class="view-more-btn" data-hover="1" aria-label="View more services — coming soon">
+        View More Services
+        <span class="vm-arrow" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </button>
+      <p id="view-more-services-note" class="view-more-note" role="status" aria-live="polite">More services coming soon</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY CHOOSE US ================= -->
+<section id="why-choose-us" class="relative py-28 lg:py-36" data-screen-label="Why Choose Us">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="max-w-[62ch] mb-16">
+      <p class="eyebrow mb-6" data-reveal="1">04 — Why Choose Us</p>
+      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-reveal="1">Why choose <span class="text-steel">ADSD</span>?</h2>
+      <p class="mt-8 text-lg leading-relaxed text-tidim" data-reveal="1">
+        We combine engineering expertise, quality craftsmanship, and reliable execution to deliver
+        steel solutions that meet the highest industry standards.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" id="why-grid">
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">01</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.5 4.9v9.8L12 22l-8.5-4.9V6.9L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Premium Quality Materials</h3>
+        <p class="text-sm text-tidim leading-relaxed">We use certified, high-quality materials to ensure durability, strength, and long-lasting performance.</p>
+      </article>
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">02</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Custom Design Capability</h3>
+        <p class="text-sm text-tidim leading-relaxed">Every project is engineered and fabricated to meet your exact specifications and project requirements.</p>
+      </article>
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">03</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M14.5 9.5c-.5-1-1.6-1.5-2.7-1.4-1.2 0-2.3.7-2.3 1.9 0 2.6 5 1.4 5 4 0 1.3-1.2 2-2.5 2-1.2 0-2.3-.5-2.8-1.5"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Competitive Pricing</h3>
+        <p class="text-sm text-tidim leading-relaxed">Cost-effective solutions without compromising on quality, precision, or industry standards.</p>
+      </article>
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">04</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Fast Delivery &amp; Export Support</h3>
+        <p class="text-sm text-tidim leading-relaxed">Efficient project execution with reliable delivery schedules and export support for international requirements.</p>
+      </article>
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">05</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12l8.73-5.04"/><path d="M12 22.08V12"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Wide Range of Products</h3>
+        <p class="text-sm text-tidim leading-relaxed">From structural steel and custom fabrication to industrial and architectural metal solutions, we provide comprehensive services.</p>
+      </article>
+
+      <article class="why-card" tabindex="0">
+        <span class="why-index">06</span>
+        <div class="why-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1v.2h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg>
+        </div>
+        <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Innovative Solutions</h3>
+        <p class="text-sm text-tidim leading-relaxed">Our experienced engineering team develops practical, efficient, and innovative solutions tailored to every project.</p>
       </article>
 
     </div>
   </div>
 </section>
 
-<!-- ================= DIVISION SHOWCASE ================= -->
-<section id="maintenance" class="relative py-28 lg:py-40 overflow-hidden" data-screen-label="Building Maintenance Division">
-  <div aria-hidden="true" class="absolute -right-24 top-1/2 -translate-y-1/2 font-display text-[26vw] leading-none text-ink3 select-none pointer-events-none uppercase">BMD</div>
-  <div class="relative max-w-[1400px] mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12">
-    <div class="lg:col-span-6">
-      <p class="eyebrow mb-6" data-reveal="1">03 — Division Showcase</p>
-      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Building <span class="text-safety">Maintenance</span> arm.</h2>
-      <p class="mt-10 text-lg leading-relaxed text-tidim max-w-[56ch]" data-reveal="1">
-        Our in-house staff performs all cleaning and maintenance, trash and recycling management, snow
-        removal, and handyman work — while our trained Property Managers schedule and monitor everything
-        we perform. We stay fully accountable, because our own team carries out the work.
+<!-- ================= OUR PRODUCTS ================= -->
+<section id="products" class="relative py-28 lg:py-36 bg-ink2 border-y border-line" data-screen-label="Our Products">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="max-w-[64ch] mb-16">
+      <p class="eyebrow mb-6" data-reveal="1">05 — Our Products</p>
+      <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-reveal="1">Premium <span class="text-steel">Stainless Steel</span> Products</h2>
+      <p class="mt-8 text-lg leading-relaxed text-tidim" data-reveal="1">
+        Discover our range of precision-engineered stainless steel products, designed for durability,
+        functionality, and long-lasting performance.
       </p>
-      <a href="mailto:ads.techdxb@gmail.com?subject=Building%20Maintenance%20Enquiry" data-hover="1"
-         class="inline-flex items-center gap-3 mt-10 font-mono text-[12px] tracking-[.18em] uppercase border border-safety/70 text-safety px-6 py-3 hover:bg-safety hover:text-ink transition-colors">
-        Enquire about maintenance <span>→</span>
-      </a>
     </div>
-    <div class="lg:col-span-6 grid sm:grid-cols-2 gap-px bg-line border border-line self-start lg:mt-24" data-reveal="1">
-      <div class="bg-ink p-7">
-        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—01</span>
-        <h3 class="mt-5 font-display text-xl uppercase">Cleaning &amp; Maintenance</h3>
-        <p class="mt-3 text-sm text-tidim leading-relaxed">Scheduled and on-call facility upkeep, executed entirely by ADSD staff.</p>
-      </div>
-      <div class="bg-ink p-7">
-        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—02</span>
-        <h3 class="mt-5 font-display text-xl uppercase">Trash &amp; Recycling</h3>
-        <p class="mt-3 text-sm text-tidim leading-relaxed">End-to-end waste and recycling management for industrial and commercial assets.</p>
-      </div>
-      <div class="bg-ink p-7">
-        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—03</span>
-        <h3 class="mt-5 font-display text-xl uppercase">Snow Removal</h3>
-        <p class="mt-3 text-sm text-tidim leading-relaxed">Specialist clearing services for cold-storage and controlled-environment facilities.</p>
-      </div>
-      <div class="bg-ink p-7">
-        <span class="font-mono text-[11px] tracking-[.2em] text-safety">M—04</span>
-        <h3 class="mt-5 font-display text-xl uppercase">Handyman Work</h3>
-        <p class="mt-3 text-sm text-tidim leading-relaxed">General repairs and small works, scheduled and verified by our Property Managers.</p>
-      </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid">
+
+      <!-- Mopping Sink -->
+      <article class="product-card">
+        <div class="product-media">
+          <span class="product-tag">Janitorial</span>
+          <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel mopping sink illustration">
+            <defs>
+              <linearGradient id="steelA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#4b5560"/><stop offset="0.5" stop-color="#8b97a4"/><stop offset="1" stop-color="#3a424c"/>
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke="#5b6774" stroke-width="1.4">
+              <!-- wall faucet -->
+              <path d="M150 60 h20 v10" stroke="#7d8996" stroke-width="3" stroke-linecap="round"/>
+              <path d="M170 70 v14" stroke="#7d8996" stroke-width="3" stroke-linecap="round"/>
+              <!-- basin body -->
+              <path d="M120 120 L280 120 L266 250 L134 250 Z" fill="url(#steelA)" fill-opacity="0.25" stroke="#8b97a4" stroke-width="2"/>
+              <!-- basin inner rim -->
+              <path d="M138 138 L262 138 L252 236 L148 236 Z" stroke="#6d7986" stroke-width="1.4"/>
+              <!-- rim highlight -->
+              <path d="M120 120 L280 120" stroke="#aeb9c6" stroke-width="3" stroke-linecap="round"/>
+              <!-- drain -->
+              <ellipse cx="200" cy="212" rx="16" ry="7" stroke="#8b97a4" stroke-width="1.6"/>
+              <line x1="192" y1="212" x2="208" y2="212" stroke="#6d7986"/>
+              <!-- floor line -->
+              <path d="M96 262 L304 262" stroke="#454e58" stroke-width="1.2"/>
+            </g>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Mopping Sink</h3>
+          <p class="text-sm text-tidim leading-relaxed">Designed for commercial and industrial cleaning areas, offering durability, hygiene, and easy maintenance.</p>
+          <a href="mopping-sink.html" class="product-enquire" data-hover="1" aria-label="Explore Mopping Sink details">
+            Explore More
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Wall Mounted Shelf -->
+      <article class="product-card">
+        <div class="product-media">
+          <span class="product-tag">Storage</span>
+          <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel wall mounted shelf illustration">
+            <defs>
+              <linearGradient id="steelB" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#8b97a4"/><stop offset="1" stop-color="#4b5560"/>
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke="#5b6774" stroke-width="1.4">
+              <!-- wall -->
+              <line x1="70" y1="40" x2="70" y2="260" stroke="#3a424c" stroke-width="1.2"/>
+              <!-- upper shelf -->
+              <path d="M70 110 L320 96 L320 106 L70 120 Z" fill="url(#steelB)" fill-opacity="0.3" stroke="#aeb9c6" stroke-width="1.6"/>
+              <path d="M70 120 L320 106 L316 116 L74 130 Z" fill="#2c333b" fill-opacity="0.5" stroke="#6d7986"/>
+              <!-- upper bracket -->
+              <path d="M90 130 L90 150 L120 120" stroke="#7d8996" stroke-width="2" stroke-linecap="round"/>
+              <path d="M280 118 L280 138 L250 110" stroke="#7d8996" stroke-width="2" stroke-linecap="round"/>
+              <!-- lower shelf -->
+              <path d="M70 190 L320 176 L320 186 L70 200 Z" fill="url(#steelB)" fill-opacity="0.3" stroke="#aeb9c6" stroke-width="1.6"/>
+              <path d="M70 200 L320 186 L316 196 L74 210 Z" fill="#2c333b" fill-opacity="0.5" stroke="#6d7986"/>
+              <!-- lower bracket -->
+              <path d="M90 210 L90 230 L120 200" stroke="#7d8996" stroke-width="2" stroke-linecap="round"/>
+              <path d="M280 198 L280 218 L250 190" stroke="#7d8996" stroke-width="2" stroke-linecap="round"/>
+              <!-- mounting bolts -->
+              <circle cx="76" cy="116" r="2.5" fill="#aeb9c6" stroke="none"/>
+              <circle cx="76" cy="196" r="2.5" fill="#aeb9c6" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Wall Mounted Shelf</h3>
+          <p class="text-sm text-tidim leading-relaxed">Premium stainless steel wall-mounted shelves built for strength, organization, and long-term use.</p>
+          <a href="wall-mounted-shelf.html" class="product-enquire" data-hover="1" aria-label="Explore Wall Mounted Shelf details">
+            Explore More
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Triple Bowl Sink -->
+      <article class="product-card">
+        <div class="product-media">
+          <span class="product-tag">Commercial</span>
+          <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel triple bowl sink illustration">
+            <defs>
+              <linearGradient id="steelC" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#6b7682"/><stop offset="1" stop-color="#3a424c"/>
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke="#5b6774" stroke-width="1.4">
+              <!-- countertop -->
+              <path d="M56 110 L344 110 L344 210 L56 210 Z" fill="url(#steelC)" fill-opacity="0.2" stroke="#8b97a4" stroke-width="2"/>
+              <path d="M56 110 L344 110" stroke="#aeb9c6" stroke-width="3" stroke-linecap="round"/>
+              <!-- faucet -->
+              <path d="M200 110 L200 78 Q200 66 212 66 L228 66" stroke="#9aa6b3" stroke-width="4" stroke-linecap="round"/>
+              <path d="M188 92 L212 92" stroke="#7d8996" stroke-width="3" stroke-linecap="round"/>
+              <!-- three bowls -->
+              <rect x="78" y="130" width="70" height="62" rx="8" fill="#20262d" stroke="#6d7986" stroke-width="1.6"/>
+              <rect x="165" y="130" width="70" height="62" rx="8" fill="#20262d" stroke="#6d7986" stroke-width="1.6"/>
+              <rect x="252" y="130" width="70" height="62" rx="8" fill="#20262d" stroke="#6d7986" stroke-width="1.6"/>
+              <!-- drains -->
+              <circle cx="113" cy="182" r="4" stroke="#8b97a4"/>
+              <circle cx="200" cy="182" r="4" stroke="#8b97a4"/>
+              <circle cx="287" cy="182" r="4" stroke="#8b97a4"/>
+              <!-- legs -->
+              <line x1="74" y1="210" x2="74" y2="250" stroke="#5b6774" stroke-width="2"/>
+              <line x1="326" y1="210" x2="326" y2="250" stroke="#5b6774" stroke-width="2"/>
+            </g>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Triple Bowl Sink</h3>
+          <p class="text-sm text-tidim leading-relaxed">Heavy-duty triple bowl sink designed for commercial kitchens and food preparation environments.</p>
+          <a href="triple-bowl-sink.html" class="product-enquire" data-hover="1" aria-label="Explore Triple Bowl Sink details">
+            Explore More
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- View More -->
+    <div class="mt-16 flex flex-col items-center" data-reveal="1">
+      <button id="view-more-products" class="view-more-btn" data-hover="1" aria-label="View more products — coming soon">
+        View More Products
+        <span class="vm-arrow" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </button>
+      <p id="view-more-note" class="view-more-note" role="status" aria-live="polite">More products coming soon</p>
     </div>
   </div>
 </section>
@@ -381,7 +970,7 @@ tailwind.config = {
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
     <div class="flex flex-wrap items-end justify-between gap-8 mb-12">
       <div>
-        <p class="eyebrow mb-6" data-reveal="1">04 — The Registry</p>
+        <p class="eyebrow mb-6" data-reveal="1">06 — Projects</p>
         <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Project log.</h2>
       </div>
       <div class="flex flex-wrap gap-2" id="registry-tabs" data-reveal="1">
@@ -482,7 +1071,7 @@ tailwind.config = {
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
     <div class="flex flex-wrap items-end justify-between gap-8 mb-16">
       <div>
-        <p class="eyebrow mb-6" data-reveal="1">05 — Client Reviews</p>
+        <p class="eyebrow mb-6" data-reveal="1">07 — Reviews</p>
         <h2 class="display-xl text-[clamp(2.2rem,4.6vw,4.6rem)]" data-split="1">Rate your experience.</h2>
       </div>
       <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Leave a review — it appears below instantly</p>
@@ -532,26 +1121,159 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- ================= CTA ================= -->
-<section class="relative py-28 lg:py-40 overflow-hidden" data-screen-label="Call to Action">
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-10 text-center">
-    <p class="eyebrow mb-8" data-reveal="1">Free quotes by phone, fax &amp; e-mail</p>
-    <h2 class="display-xl text-[clamp(2.4rem,6.4vw,6.4rem)]" data-split="1">Let&rsquo;s build your next structure.</h2>
-    <div class="mt-12 flex flex-wrap justify-center gap-4" data-reveal="1">
-      <a href="tel:+971569968611" data-hover="1"
-         class="font-mono text-[12px] tracking-[.18em] uppercase bg-steel text-ink px-8 py-4 hover:bg-ti transition-colors">
-        Call +971 56 996 8611
-      </a>
-      <a href="mailto:ads.techdxb@gmail.com" data-hover="1"
-         class="font-mono text-[12px] tracking-[.18em] uppercase border border-line text-ti px-8 py-4 hover:border-steel hover:text-steel transition-colors">
-        ads.techdxb@gmail.com
-      </a>
+<!-- ================= CONTACT ================= -->
+<section id="regulatory" class="relative py-28 lg:py-36 bg-ink" id="contact-section" data-screen-label="Contact">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="grid lg:grid-cols-[40%_60%] gap-12 lg:gap-16 items-start">
+
+      <!-- LEFT: Info -->
+      <div>
+        <p class="eyebrow mb-6" id="contact-eyebrow">Get In Touch</p>
+        <h2 class="display-xl text-[clamp(2rem,4.2vw,4.2rem)] leading-none mb-6" id="contact-heading">Let&rsquo;s Build Something<br><span class="text-steel">Amazing Together</span></h2>
+        <p class="text-base text-tidim leading-relaxed max-w-[46ch] mb-12" id="contact-sub">
+          Whether you have a project in mind or just want to explore what&rsquo;s possible — reach out. Our team responds fast, consultations are free, and every solution is built around your needs.
+        </p>
+
+        <!-- Contact cards -->
+        <div class="flex flex-col gap-3 mb-12" id="contact-cards">
+          <a href="tel:+971569968611" class="contact-info-card" data-hover="1">
+            <div class="contact-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div>
+              <p class="font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-1">Call / WhatsApp</p>
+              <p class="text-ti font-medium">+971 56 996 8611</p>
+            </div>
+          </a>
+          <a href="mailto:ads.techdxb@gmail.com" class="contact-info-card" data-hover="1">
+            <div class="contact-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <p class="font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-1">Email Address</p>
+              <p class="text-ti font-medium">ads.techdxb@gmail.com</p>
+            </div>
+          </a>
+          <div class="contact-info-card">
+            <div class="contact-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <p class="font-mono text-[10px] tracking-[.2em] uppercase text-tidim mb-1">Office Address</p>
+              <p class="text-ti font-medium">Dubai &amp; Sharjah, UAE</p>
+              <p class="text-tidim text-sm mt-0.5">Licensed in Dubai · Sharjah</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust points -->
+        <div class="flex flex-col gap-3" id="contact-trust">
+          <div class="trust-item">
+            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+            Fast Response
+          </div>
+          <div class="trust-item">
+            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+            Free Consultation
+          </div>
+          <div class="trust-item">
+            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+            Tailored Business Solutions
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Form card -->
+      <div class="contact-form-card" id="contact-form-card">
+        <h3 class="font-display text-2xl uppercase tracking-wide mb-8 text-ti">Send an Enquiry</h3>
+
+        <form id="contact-form" novalidate aria-label="Contact enquiry form">
+          <div class="grid sm:grid-cols-2 gap-5">
+
+            <div class="contact-field">
+              <label for="cf-name">Full Name <span aria-hidden="true" class="text-steel">*</span></label>
+              <input id="cf-name" name="name" type="text" required autocomplete="name"
+                     class="contact-input" placeholder="Your full name" />
+            </div>
+
+            <div class="contact-field">
+              <label for="cf-email">Work Email <span aria-hidden="true" class="text-steel">*</span></label>
+              <input id="cf-email" name="email" type="email" required autocomplete="email"
+                     class="contact-input" placeholder="you@company.com" />
+            </div>
+
+            <div class="contact-field">
+              <label for="cf-phone">Phone / WhatsApp</label>
+              <input id="cf-phone" name="phone" type="tel" autocomplete="tel"
+                     class="contact-input" placeholder="+971 __ ___ ____" />
+            </div>
+
+            <div class="contact-field">
+              <label for="cf-company">Company Name</label>
+              <input id="cf-company" name="company" type="text" autocomplete="organization"
+                     class="contact-input" placeholder="Your company" />
+            </div>
+
+            <div class="contact-field sm:col-span-2">
+              <label for="cf-service">Service Required</label>
+              <select id="cf-service" name="service" class="contact-input">
+                <option value="" disabled selected>Select a service…</option>
+                <option value="structural-steel">Structural Steel Fabrication &amp; Installation</option>
+                <option value="misc-metal">Miscellaneous Metal Work</option>
+                <option value="supply">Supply Services</option>
+                <option value="other">Other / General Enquiry</option>
+              </select>
+            </div>
+
+            <div class="contact-field sm:col-span-2">
+              <label for="cf-message">Message <span aria-hidden="true" class="text-steel">*</span></label>
+              <textarea id="cf-message" name="message" required rows="4"
+                        class="contact-input" placeholder="Tell us about your project — scope, location, timeline…"></textarea>
+            </div>
+
+          </div>
+
+          <div class="mt-8">
+            <button type="submit" class="contact-submit-btn" data-hover="1" aria-label="Send enquiry">
+              Send Enquiry <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+            <p id="cf-msg" class="mt-4 font-mono text-[10px] tracking-[.16em] uppercase text-center min-h-[1em]"></p>
+            <p class="mt-2 text-center font-mono text-[10px] tracking-[.14em] uppercase text-tidim/60">
+              We typically respond within one business day.
+            </p>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </section>
 
+<!-- ================= FLOATING CONTACT WIDGET ================= -->
+<div id="fab-widget" aria-label="Quick contact">
+  <a href="https://wa.me/971569968611?text=Hello%20ADSD%2C%20I%E2%80%99d%20like%20to%20enquire%20about%20your%20steel%20fabrication%20%26%20construction%20services."
+     target="_blank" rel="noopener" class="fab-btn fab-whatsapp" data-hover="1">
+    <span class="fab-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.05 21.785h-.01a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.86 9.86 0 012.17 12.05C2.17 6.53 6.53 2.17 12.05 2.17c2.67 0 5.18 1.04 7.07 2.929a9.93 9.93 0 012.93 7.072c-.004 5.522-4.363 9.882-9.885 9.882l-.115-.001zM20.52 3.449C18.24 1.226 15.24 0 12.045 0 5.463 0 .104 5.334.1 11.893a11.79 11.79 0 001.588 5.946L0 24l6.305-1.654a11.88 11.88 0 005.683 1.448h.005c6.585 0 11.946-5.336 11.949-11.896a11.84 11.84 0 00-3.498-8.449z"/></svg>
+    </span>
+    <span class="fab-label">WhatsApp</span>
+  </a>
+  <a href="tel:+971569968611" class="fab-btn fab-call" data-hover="1">
+    <span class="fab-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2F3F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    </span>
+    <span class="fab-label">Call Now</span>
+  </a>
+  <button class="fab-btn fab-enquire" id="fab-enquire-btn" data-hover="1">
+    <span class="fab-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </span>
+    <span class="fab-label">Enquire Now</span>
+  </button>
+</div>
+
 <!-- ================= REGULATORY FOOTER ================= -->
-<footer id="regulatory" class="relative border-t border-line bg-ink2" data-screen-label="Regulatory Footer">
+<footer class="relative border-t border-line bg-ink2" data-screen-label="Regulatory Footer">
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-16">
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line mb-14">
       <div class="bg-ink p-7">
@@ -746,7 +1468,7 @@ tailwind.config = {
 
   /* ============ GSAP SCROLL ENGINE ============ */
   if (window.gsap && window.ScrollTrigger) {
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
     if (!reduceMotion) {
       /* hero text mask reveal */
@@ -781,6 +1503,26 @@ tailwind.config = {
         opacity: 0, y: 40, duration: .8, ease: 'power3.out', stagger: .09,
         scrollTrigger: { trigger: '#segment-row', start: 'top 82%' }
       });
+
+      /* why-choose-us cards stagger in */
+      gsap.from('#why-grid .why-card', {
+        opacity: 0, y: 44, duration: .7, ease: 'power3.out', stagger: 0.1,
+        scrollTrigger: { trigger: '#why-grid', start: 'top 82%' }
+      });
+
+      /* product cards stagger in */
+      gsap.from('#product-grid .product-card', {
+        opacity: 0, y: 48, duration: .75, ease: 'power3.out', stagger: 0.12,
+        scrollTrigger: { trigger: '#product-grid', start: 'top 82%' }
+      });
+
+      /* service card background parallax */
+      document.querySelectorAll('#segment-row .seg-media').forEach(function (media) {
+        gsap.fromTo(media, { yPercent: -6 }, {
+          yPercent: 6, ease: 'none',
+          scrollTrigger: { trigger: '#segment-row', start: 'top bottom', end: 'bottom top', scrub: true }
+        });
+      });
     } else {
       document.querySelectorAll('#hero-headline .reveal-line > span').forEach(function (s) { s.style.transform = 'none'; });
     }
@@ -799,6 +1541,254 @@ tailwind.config = {
       });
     });
   }
+
+  /* ============ MOBILE MENU + DROPDOWN ============ */
+  var hamburger = document.getElementById('hamburger');
+  var mobileMenu = document.getElementById('mobile-menu');
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', function () {
+      var open = mobileMenu.classList.toggle('is-open');
+      hamburger.classList.toggle('is-open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        mobileMenu.classList.remove('is-open');
+        hamburger.classList.remove('is-open');
+        document.body.style.overflow = '';
+      });
+    });
+    mobileMenu.querySelectorAll('.mobile-toggle').forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        var group = toggle.getAttribute('data-toggle');
+        var subs = mobileMenu.querySelectorAll('.mobile-sub[data-group="' + group + '"]');
+        var expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        subs.forEach(function (s) { s.style.display = expanded ? 'none' : 'block'; });
+      });
+    });
+  }
+
+  /* ============ ACTIVE PAGE HIGHLIGHT ============ */
+  (function highlightActivePage() {
+    var seg = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    var current = seg.replace(/\.html$/, '');
+    var activeGroup = null;
+    document.querySelectorAll('[data-page]').forEach(function (el) {
+      if (el.getAttribute('data-page') === current) {
+        el.classList.add('is-active');
+        activeGroup = el.getAttribute('data-page-group');
+      }
+    });
+    if (activeGroup) {
+      document.querySelectorAll('[data-nav-group="' + activeGroup + '"]').forEach(function (el) {
+        el.classList.add('is-active');
+      });
+    }
+  })();
+
+  /* ============ GSAP SMOOTH SCROLL ============ */
+  document.querySelectorAll('header a[href^="#"], #mobile-menu a[href^="#"], .nav-dropdown-menu a[href^="#"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var target = document.querySelector(link.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      if (window.gsap) {
+        gsap.to(window, { duration: 1, scrollTo: { y: target, offsetY: 64 }, ease: 'power3.inOut' });
+      } else {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  /* ============ CONTACT SECTION ANIMATIONS ============ */
+  (function initContact() {
+    var section = document.getElementById('regulatory');
+    if (!section || !window.gsap || reduceMotion) return;
+
+    var tl = gsap.timeline({
+      scrollTrigger: { trigger: section, start: 'top 78%', once: true }
+    });
+
+    tl.from('#contact-eyebrow', { opacity: 0, y: 18, duration: .55, ease: 'power2.out' })
+      .from('#contact-heading', { opacity: 0, y: 28, duration: .7, ease: 'power3.out' }, '-=.3')
+      .from('#contact-sub', { opacity: 0, y: 20, duration: .6, ease: 'power2.out' }, '-=.4')
+      .from('#contact-cards .contact-info-card', { opacity: 0, x: -24, duration: .55, ease: 'power2.out', stagger: .1 }, '-=.3')
+      .from('#contact-trust .trust-item', { opacity: 0, x: -16, duration: .45, ease: 'power2.out', stagger: .08 }, '-=.25')
+      .from('#contact-form-card', { opacity: 0, y: 40, duration: .75, ease: 'power3.out' }, '-=.6')
+      .from('#contact-form-card .contact-field', { opacity: 0, y: 16, duration: .45, ease: 'power2.out', stagger: .07 }, '-=.5')
+      .from('#contact-form-card .contact-submit-btn', { opacity: 0, y: 12, scale: .97, duration: .45, ease: 'back.out(1.4)' }, '-=.25');
+  })();
+
+  /* ============ CONTACT FORM SUBMIT ============ */
+  (function initContactForm() {
+    var form = document.getElementById('contact-form');
+    var msg  = document.getElementById('cf-msg');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name    = form.querySelector('[name="name"]').value.trim();
+      var email   = form.querySelector('[name="email"]').value.trim();
+      var message = form.querySelector('[name="message"]').value.trim();
+
+      if (!name || !email || !message) {
+        msg.textContent = 'Please fill in all required fields.';
+        msg.style.color = '#FF6B1A';
+        return;
+      }
+      var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(email)) {
+        msg.textContent = 'Please enter a valid email address.';
+        msg.style.color = '#FF6B1A';
+        return;
+      }
+
+      /* Build mailto — graceful fallback, no server needed */
+      var service  = form.querySelector('[name="service"]').value;
+      var company  = form.querySelector('[name="company"]').value.trim();
+      var phone    = form.querySelector('[name="phone"]').value.trim();
+      var body = 'Name: ' + name + '\n'
+               + 'Email: ' + email + (phone ? '\nPhone: ' + phone : '')
+               + (company ? '\nCompany: ' + company : '')
+               + (service ? '\nService: ' + service : '')
+               + '\n\nMessage:\n' + message;
+      var mailto = 'mailto:ads.techdxb@gmail.com'
+                 + '?subject=' + encodeURIComponent('Enquiry from ' + name)
+                 + '&body='    + encodeURIComponent(body);
+
+      var btn = form.querySelector('.contact-submit-btn');
+      btn.textContent = 'Opening mail client…';
+      btn.disabled = true;
+
+      window.location.href = mailto;
+
+      setTimeout(function () {
+        msg.textContent = 'Thank you! Your enquiry has been prepared — please send the email that opened.';
+        msg.style.color = '#4DA3FF';
+        form.reset();
+        btn.innerHTML = 'Send Enquiry <span class="btn-arrow" aria-hidden="true">→</span>';
+        btn.disabled = false;
+        setTimeout(function () { msg.textContent = ''; }, 7000);
+      }, 800);
+    });
+  })();
+
+  /* ============ SERVICES — IMAGE ZOOM + VIEW MORE ============ */
+  (function initServices() {
+    /* GSAP hover zoom (1.08) on each card's background image */
+    if (window.gsap && !reduceMotion && finePointer) {
+      document.querySelectorAll('#segment-row .seg-card').forEach(function (card) {
+        var img = card.querySelector('.seg-img');
+        if (!img) return;
+        card.addEventListener('mouseenter', function () {
+          gsap.to(img, { scale: 1.08, duration: .9, ease: 'power3.out', overwrite: 'auto' });
+        });
+        card.addEventListener('mouseleave', function () {
+          gsap.to(img, { scale: 1, duration: 1.1, ease: 'power3.out', overwrite: 'auto' });
+        });
+      });
+    }
+
+    /* View More Services — inactive, ready for future expansion */
+    var btn = document.getElementById('view-more-services');
+    var note = document.getElementById('view-more-services-note');
+    if (btn) {
+      var t;
+      btn.addEventListener('click', function () {
+        btn.classList.remove('is-nudge'); void btn.offsetWidth; btn.classList.add('is-nudge');
+        if (note) {
+          note.classList.add('is-visible');
+          clearTimeout(t);
+          t = setTimeout(function () { note.classList.remove('is-visible'); }, 3500);
+        }
+      });
+    }
+  })();
+
+  /* ============ OUR PRODUCTS ============ */
+  (function initProducts() {
+    /* View More Products — inactive, ready for future expansion */
+    var vmBtn = document.getElementById('view-more-products');
+    var vmNote = document.getElementById('view-more-note');
+    if (vmBtn) {
+      var noteTimer;
+      vmBtn.addEventListener('click', function () {
+        if (window.gsap && !reduceMotion) {
+          gsap.fromTo(vmBtn, { x: 0 }, { x: 0, duration: .5, clearProps: 'x', ease: 'power1.out' });
+        }
+        vmBtn.classList.remove('is-nudge'); void vmBtn.offsetWidth; vmBtn.classList.add('is-nudge');
+        if (vmNote) {
+          vmNote.classList.add('is-visible');
+          clearTimeout(noteTimer);
+          noteTimer = setTimeout(function () { vmNote.classList.remove('is-visible'); }, 3500);
+        }
+      });
+    }
+
+    /* Enquire Now → scroll to contact + pre-fill service/message */
+    document.querySelectorAll('.product-enquire[data-enquire]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        var target = document.getElementById('regulatory');
+        if (!target) return;
+        e.preventDefault();
+        var product = link.getAttribute('data-enquire');
+        var msgField = document.getElementById('cf-message');
+        if (msgField && !msgField.value.trim()) {
+          msgField.value = 'I would like to enquire about the ' + product + '.';
+        }
+        if (window.gsap && window.ScrollToPlugin) {
+          gsap.to(window, { duration: 1, scrollTo: { y: target, offsetY: 64 }, ease: 'power3.inOut' });
+        } else {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  })();
+
+  /* ============ FLOATING CONTACT WIDGET ============ */
+  (function initFab() {
+    var fabBtns = document.querySelectorAll('#fab-widget .fab-btn');
+    if (!fabBtns.length) return;
+
+    // GSAP entrance animation
+    if (window.gsap && !reduceMotion) {
+      gsap.set(fabBtns, { opacity: 0, y: 40, scale: 0.7 });
+      gsap.to(fabBtns, {
+        opacity: 1, y: 0, scale: 1,
+        duration: 0.7, ease: 'back.out(1.4)', stagger: 0.12, delay: 1.8
+      });
+    }
+
+    // Ripple effect on click
+    fabBtns.forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var ripple = document.createElement('span');
+        ripple.className = 'fab-ripple';
+        var size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(function () { ripple.remove(); }, 600);
+      });
+    });
+
+    // Enquire button scrolls to contact
+    var enquireBtn = document.getElementById('fab-enquire-btn');
+    if (enquireBtn) {
+      enquireBtn.addEventListener('click', function (e) {
+        var target = document.getElementById('regulatory');
+        if (!target) return;
+        if (window.gsap && window.ScrollToPlugin) {
+          gsap.to(window, { duration: 1, scrollTo: { y: target, offsetY: 64 }, ease: 'power3.inOut' });
+        } else {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  })();
 
   /* ============ REGISTRY FILTER ============ */
   var tabs = document.querySelectorAll('#registry-tabs .reg-tab');
