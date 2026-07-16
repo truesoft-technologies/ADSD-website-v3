@@ -94,25 +94,25 @@ tailwind.config = {
   .breadcrumb .sep { color:#3a3f45; }
   .breadcrumb .current { color:#F2F3F5; }
 
-  /* gallery masonry — immersive portfolio style, no captions */
+  /* gallery masonry — real project photography, captioned */
   .gallery { column-count:1; column-gap:20px; }
   @media (min-width:640px) { .gallery { column-count:2; } }
   @media (min-width:1024px) { .gallery { column-count:3; column-gap:24px; } }
-  .gallery-item {
-    break-inside:avoid; margin:0 0 20px; width:100%; padding:0; border:none;
-    background:#121315; border-radius:18px; overflow:hidden; position:relative; display:block; cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
+  .gallery-item { break-inside:avoid; margin:0 0 26px; width:100%; }
+  .gallery-photo-btn {
+    border:1px solid #26282C; background:#121315; border-radius:16px; overflow:hidden; position:relative;
+    display:block; width:100%; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
-  .gallery-item img {
+  .gallery-photo-btn img {
     width:100%; height:auto; display:block;
     transition:transform .9s cubic-bezier(.22,1,.36,1), opacity .6s ease;
   }
-  @media (pointer:fine) { .gallery-item:hover img { transform:scale(1.06); } }
+  @media (pointer:fine) { .gallery-photo-btn:hover img { transform:scale(1.06); } }
   .gallery-overlay {
     position:absolute; inset:0; background:rgba(9,10,11,.5);
     opacity:0; transition:opacity .45s ease; pointer-events:none;
   }
-  .gallery-item:hover .gallery-overlay { opacity:1; }
+  .gallery-photo-btn:hover .gallery-overlay { opacity:1; }
   .gallery-plus {
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.55);
     width:60px; height:60px; border-radius:50%;
@@ -122,8 +122,13 @@ tailwind.config = {
     opacity:0; transition:opacity .4s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
     pointer-events:none;
   }
-  .gallery-item:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
-  .gallery-item:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
+  .gallery-photo-btn:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .gallery-photo-btn:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
+  .gallery-caption {
+    margin-top:12px; padding:0 2px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:#9BA1A8; transition:color .3s;
+  }
+  .gallery-item:hover .gallery-caption { color:#4DA3FF; }
 
   /* lightbox — fullscreen, swipeable */
   .lightbox {
@@ -292,76 +297,106 @@ tailwind.config = {
     </div>
 
     <div class="gallery" id="gallery">
-        <button type="button" class="gallery-item" data-index="0" data-full="images/mopping-sink/mopping-sink-1.jpeg" aria-label="Enlarge Mopping Sink photo 1 of 10">
-          <img src="images/mopping-sink/mopping-sink-1.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="1" data-full="images/mopping-sink/mopping-sink-2.jpeg" aria-label="Enlarge Mopping Sink photo 2 of 10">
-          <img src="images/mopping-sink/mopping-sink-2.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="2" data-full="images/mopping-sink/mopping-sink-3.jpeg" aria-label="Enlarge Mopping Sink photo 3 of 10">
-          <img src="images/mopping-sink/mopping-sink-3.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="3" data-full="images/mopping-sink/mopping-sink-4.jpeg" aria-label="Enlarge Mopping Sink photo 4 of 10">
-          <img src="images/mopping-sink/mopping-sink-4.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="4" data-full="images/mopping-sink/mopping-sink-5.jpeg" aria-label="Enlarge Mopping Sink photo 5 of 10">
-          <img src="images/mopping-sink/mopping-sink-5.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="5" data-full="images/mopping-sink/mopping-sink-6.jpeg" aria-label="Enlarge Mopping Sink photo 6 of 10">
-          <img src="images/mopping-sink/mopping-sink-6.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="6" data-full="images/mopping-sink/mopping-sink-7.jpeg" aria-label="Enlarge Mopping Sink photo 7 of 10">
-          <img src="images/mopping-sink/mopping-sink-7.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="7" data-full="images/mopping-sink/mopping-sink-8.jpeg" aria-label="Enlarge Mopping Sink photo 8 of 10">
-          <img src="images/mopping-sink/mopping-sink-8.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="8" data-full="images/mopping-sink/mopping-sink-9.jpeg" aria-label="Enlarge Mopping Sink photo 9 of 10">
-          <img src="images/mopping-sink/mopping-sink-9.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="9" data-full="images/mopping-sink/mopping-sink-10.jpeg" aria-label="Enlarge Mopping Sink photo 10 of 10">
-          <img src="images/mopping-sink/mopping-sink-10.jpeg" alt="Mopping Sink — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="0" data-full="images/mopping-sink/mopping-sink-1.jpeg" data-caption="Basin Fabrication — Workshop" aria-label="Enlarge Basin Fabrication — Workshop photo">
+            <img src="images/mopping-sink/mopping-sink-1.jpeg" alt="Basin Fabrication — Workshop — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Basin Fabrication — Workshop</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="1" data-full="images/mopping-sink/mopping-sink-2.jpeg" data-caption="Grated Drain Cover" aria-label="Enlarge Grated Drain Cover photo">
+            <img src="images/mopping-sink/mopping-sink-2.jpeg" alt="Grated Drain Cover — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Grated Drain Cover</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="2" data-full="images/mopping-sink/mopping-sink-3.jpeg" data-caption="Tile Insert Drain — Installed" aria-label="Enlarge Tile Insert Drain — Installed photo">
+            <img src="images/mopping-sink/mopping-sink-3.jpeg" alt="Tile Insert Drain — Installed — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Tile Insert Drain — Installed</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="3" data-full="images/mopping-sink/mopping-sink-4.jpeg" data-caption="Perforated Grate Cover" aria-label="Enlarge Perforated Grate Cover photo">
+            <img src="images/mopping-sink/mopping-sink-4.jpeg" alt="Perforated Grate Cover — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Perforated Grate Cover</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="4" data-full="images/mopping-sink/mopping-sink-5.jpeg" data-caption="Drain Strainer Basket" aria-label="Enlarge Drain Strainer Basket photo">
+            <img src="images/mopping-sink/mopping-sink-5.jpeg" alt="Drain Strainer Basket — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Drain Strainer Basket</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="5" data-full="images/mopping-sink/mopping-sink-6.jpeg" data-caption="Recessed Sink Frame" aria-label="Enlarge Recessed Sink Frame photo">
+            <img src="images/mopping-sink/mopping-sink-6.jpeg" alt="Recessed Sink Frame — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Recessed Sink Frame</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="6" data-full="images/mopping-sink/mopping-sink-7.jpeg" data-caption="Chequer Plate Grating" aria-label="Enlarge Chequer Plate Grating photo">
+            <img src="images/mopping-sink/mopping-sink-7.jpeg" alt="Chequer Plate Grating — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Chequer Plate Grating</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="7" data-full="images/mopping-sink/mopping-sink-8.jpeg" data-caption="Solid Top Access Cover" aria-label="Enlarge Solid Top Access Cover photo">
+            <img src="images/mopping-sink/mopping-sink-8.jpeg" alt="Solid Top Access Cover — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Solid Top Access Cover</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="8" data-full="images/mopping-sink/mopping-sink-9.jpeg" data-caption="Slotted Drain Cover — Installed" aria-label="Enlarge Slotted Drain Cover — Installed photo">
+            <img src="images/mopping-sink/mopping-sink-9.jpeg" alt="Slotted Drain Cover — Installed — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Slotted Drain Cover — Installed</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="9" data-full="images/mopping-sink/mopping-sink-10.jpeg" data-caption="Roof Drain Dome Strainer" aria-label="Enlarge Roof Drain Dome Strainer photo">
+            <img src="images/mopping-sink/mopping-sink-10.jpeg" alt="Roof Drain Dome Strainer — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Roof Drain Dome Strainer</figcaption>
+        </figure>
     </div>
   </div>
 </section>
@@ -571,38 +606,42 @@ tailwind.config = {
   });
 
   /* lightbox */
-  var items = Array.prototype.slice.call(document.querySelectorAll('#gallery .gallery-item'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('#gallery .gallery-photo-btn'));
   var sources = items.map(function (it) { return it.getAttribute('data-full'); });
+  var captions = items.map(function (it) { return it.getAttribute('data-caption') || ''; });
   var lb = document.getElementById('lightbox');
   var lbImg = document.getElementById('lb-img');
   var lbCounter = document.getElementById('lb-counter');
   var current = 0;
 
+  function updateCounter() {
+    lbCounter.textContent = (captions[current] ? captions[current] + ' — ' : '') + (current + 1) + ' / ' + sources.length;
+  }
   function show(i) {
     current = (i + sources.length) % sources.length;
-    lbCounter.textContent = (current + 1) + ' / ' + sources.length;
+    updateCounter();
     var pre = new Image();
     if (window.gsap && !reduceMotion) {
       gsap.to(lbImg, { opacity:0, scale:.96, duration:.2, ease:'power2.in', onComplete:function () {
         pre.onload = function () {
-          lbImg.src = sources[current];
+          lbImg.src = sources[current]; lbImg.alt = captions[current];
           gsap.fromTo(lbImg, { opacity:0, scale:.96 }, { opacity:1, scale:1, duration:.4, ease:'power3.out' });
         };
         pre.src = sources[current];
       }});
     } else {
       lbImg.style.opacity = '0';
-      pre.onload = function () { lbImg.src = sources[current]; lbImg.style.opacity = '1'; };
+      pre.onload = function () { lbImg.src = sources[current]; lbImg.alt = captions[current]; lbImg.style.opacity = '1'; };
       pre.src = sources[current];
     }
   }
   function openLb(i) {
     current = (i + sources.length) % sources.length;
-    lbCounter.textContent = (current + 1) + ' / ' + sources.length;
+    updateCounter();
     var pre = new Image();
     lbImg.style.opacity = '0';
     pre.onload = function () {
-      lbImg.src = sources[current];
+      lbImg.src = sources[current]; lbImg.alt = captions[current];
       if (window.gsap && !reduceMotion) {
         gsap.fromTo(lbImg, { opacity:0, scale:.9 }, { opacity:1, scale:1, duration:.5, ease:'power3.out' });
       } else {

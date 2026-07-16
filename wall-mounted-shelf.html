@@ -94,25 +94,25 @@ tailwind.config = {
   .breadcrumb .sep { color:#3a3f45; }
   .breadcrumb .current { color:#F2F3F5; }
 
-  /* gallery masonry — immersive portfolio style, no captions */
+  /* gallery masonry — real project photography, captioned */
   .gallery { column-count:1; column-gap:20px; }
   @media (min-width:640px) { .gallery { column-count:2; } }
   @media (min-width:1024px) { .gallery { column-count:3; column-gap:24px; } }
-  .gallery-item {
-    break-inside:avoid; margin:0 0 20px; width:100%; padding:0; border:none;
-    background:#121315; border-radius:18px; overflow:hidden; position:relative; display:block; cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
+  .gallery-item { break-inside:avoid; margin:0 0 26px; width:100%; }
+  .gallery-photo-btn {
+    border:1px solid #26282C; background:#121315; border-radius:16px; overflow:hidden; position:relative;
+    display:block; width:100%; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
-  .gallery-item img {
+  .gallery-photo-btn img {
     width:100%; height:auto; display:block;
     transition:transform .9s cubic-bezier(.22,1,.36,1), opacity .6s ease;
   }
-  @media (pointer:fine) { .gallery-item:hover img { transform:scale(1.06); } }
+  @media (pointer:fine) { .gallery-photo-btn:hover img { transform:scale(1.06); } }
   .gallery-overlay {
     position:absolute; inset:0; background:rgba(9,10,11,.5);
     opacity:0; transition:opacity .45s ease; pointer-events:none;
   }
-  .gallery-item:hover .gallery-overlay { opacity:1; }
+  .gallery-photo-btn:hover .gallery-overlay { opacity:1; }
   .gallery-plus {
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.55);
     width:60px; height:60px; border-radius:50%;
@@ -122,8 +122,13 @@ tailwind.config = {
     opacity:0; transition:opacity .4s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
     pointer-events:none;
   }
-  .gallery-item:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
-  .gallery-item:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
+  .gallery-photo-btn:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .gallery-photo-btn:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
+  .gallery-caption {
+    margin-top:12px; padding:0 2px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:#9BA1A8; transition:color .3s;
+  }
+  .gallery-item:hover .gallery-caption { color:#4DA3FF; }
 
   /* lightbox — fullscreen, swipeable */
   .lightbox {
@@ -292,111 +297,156 @@ tailwind.config = {
     </div>
 
     <div class="gallery" id="gallery">
-        <button type="button" class="gallery-item" data-index="0" data-full="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 1 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="1" data-full="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 2 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="2" data-full="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 3 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="3" data-full="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 4 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="4" data-full="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 5 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="5" data-full="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 6 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="6" data-full="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 7 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="7" data-full="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 8 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="8" data-full="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 9 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="9" data-full="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 10 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="10" data-full="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 11 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="11" data-full="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 12 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="12" data-full="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 13 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="13" data-full="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 14 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
-        <button type="button" class="gallery-item" data-index="14" data-full="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" aria-label="Enlarge Wall Mounted Shelf photo 15 of 15">
-          <img src="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" alt="Wall Mounted Shelf — stainless steel fabrication by ADSD" loading="lazy" decoding="async" />
-          <span class="gallery-overlay" aria-hidden="true"></span>
-          <span class="gallery-plus" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </span>
-        </button>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="0" data-full="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" data-caption="Floor-Standing Storage Frame" aria-label="Enlarge Floor-Standing Storage Frame photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" alt="Floor-Standing Storage Frame — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Floor-Standing Storage Frame</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="1" data-full="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" data-caption="Commercial Cooking Range Unit" aria-label="Enlarge Commercial Cooking Range Unit photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" alt="Commercial Cooking Range Unit — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Commercial Cooking Range Unit</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="2" data-full="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" data-caption="Wire Mesh Storage Racks" aria-label="Enlarge Wire Mesh Storage Racks photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" alt="Wire Mesh Storage Racks — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Wire Mesh Storage Racks</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="3" data-full="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" data-caption="Stainless Steel Work Table" aria-label="Enlarge Stainless Steel Work Table photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" alt="Stainless Steel Work Table — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Stainless Steel Work Table</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="4" data-full="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" data-caption="Work Table with Backsplash" aria-label="Enlarge Work Table with Backsplash photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" alt="Work Table with Backsplash — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Work Table with Backsplash</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="5" data-full="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" data-caption="Stainless Steel Stool" aria-label="Enlarge Stainless Steel Stool photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" alt="Stainless Steel Stool — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Stainless Steel Stool</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="6" data-full="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" data-caption="Stainless Steel Handrail" aria-label="Enlarge Stainless Steel Handrail photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" alt="Stainless Steel Handrail — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Stainless Steel Handrail</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="7" data-full="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" data-caption="Mobile Stainless Steel Basin" aria-label="Enlarge Mobile Stainless Steel Basin photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" alt="Mobile Stainless Steel Basin — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Mobile Stainless Steel Basin</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="8" data-full="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" data-caption="Wall Mounted Shelf with Brackets" aria-label="Enlarge Wall Mounted Shelf with Brackets photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" alt="Wall Mounted Shelf with Brackets — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Wall Mounted Shelf with Brackets</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="9" data-full="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" data-caption="Cabinet Handle Detail" aria-label="Enlarge Cabinet Handle Detail photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" alt="Cabinet Handle Detail — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Cabinet Handle Detail</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="10" data-full="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" data-caption="Decorative Gold Screen Panel" aria-label="Enlarge Decorative Gold Screen Panel photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" alt="Decorative Gold Screen Panel — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Decorative Gold Screen Panel</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="11" data-full="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" data-caption="Vanity Cabinet with Brass Trim" aria-label="Enlarge Vanity Cabinet with Brass Trim photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" alt="Vanity Cabinet with Brass Trim — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Vanity Cabinet with Brass Trim</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="12" data-full="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" data-caption="Triple Bowl Sink Unit" aria-label="Enlarge Triple Bowl Sink Unit photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" alt="Triple Bowl Sink Unit — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Triple Bowl Sink Unit</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="13" data-full="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" data-caption="Storage Room Shelving — Installed" aria-label="Enlarge Storage Room Shelving — Installed photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" alt="Storage Room Shelving — Installed — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Storage Room Shelving — Installed</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <button type="button" class="gallery-photo-btn" data-index="14" data-full="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" data-caption="Glass Staircase Handrail" aria-label="Enlarge Glass Staircase Handrail photo">
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" alt="Glass Staircase Handrail — ADSD" loading="lazy" decoding="async" />
+            <span class="gallery-overlay" aria-hidden="true"></span>
+            <span class="gallery-plus" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <figcaption class="gallery-caption">Glass Staircase Handrail</figcaption>
+        </figure>
     </div>
   </div>
 </section>
@@ -606,38 +656,42 @@ tailwind.config = {
   });
 
   /* lightbox */
-  var items = Array.prototype.slice.call(document.querySelectorAll('#gallery .gallery-item'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('#gallery .gallery-photo-btn'));
   var sources = items.map(function (it) { return it.getAttribute('data-full'); });
+  var captions = items.map(function (it) { return it.getAttribute('data-caption') || ''; });
   var lb = document.getElementById('lightbox');
   var lbImg = document.getElementById('lb-img');
   var lbCounter = document.getElementById('lb-counter');
   var current = 0;
 
+  function updateCounter() {
+    lbCounter.textContent = (captions[current] ? captions[current] + ' — ' : '') + (current + 1) + ' / ' + sources.length;
+  }
   function show(i) {
     current = (i + sources.length) % sources.length;
-    lbCounter.textContent = (current + 1) + ' / ' + sources.length;
+    updateCounter();
     var pre = new Image();
     if (window.gsap && !reduceMotion) {
       gsap.to(lbImg, { opacity:0, scale:.96, duration:.2, ease:'power2.in', onComplete:function () {
         pre.onload = function () {
-          lbImg.src = sources[current];
+          lbImg.src = sources[current]; lbImg.alt = captions[current];
           gsap.fromTo(lbImg, { opacity:0, scale:.96 }, { opacity:1, scale:1, duration:.4, ease:'power3.out' });
         };
         pre.src = sources[current];
       }});
     } else {
       lbImg.style.opacity = '0';
-      pre.onload = function () { lbImg.src = sources[current]; lbImg.style.opacity = '1'; };
+      pre.onload = function () { lbImg.src = sources[current]; lbImg.alt = captions[current]; lbImg.style.opacity = '1'; };
       pre.src = sources[current];
     }
   }
   function openLb(i) {
     current = (i + sources.length) % sources.length;
-    lbCounter.textContent = (current + 1) + ' / ' + sources.length;
+    updateCounter();
     var pre = new Image();
     lbImg.style.opacity = '0';
     pre.onload = function () {
-      lbImg.src = sources[current];
+      lbImg.src = sources[current]; lbImg.alt = captions[current];
       if (window.gsap && !reduceMotion) {
         gsap.fromTo(lbImg, { opacity:0, scale:.9 }, { opacity:1, scale:1, duration:.5, ease:'power3.out' });
       } else {
