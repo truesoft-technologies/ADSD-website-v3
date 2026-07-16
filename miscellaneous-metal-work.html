@@ -94,31 +94,54 @@ tailwind.config = {
   .breadcrumb .sep { color:#3a3f45; }
   .breadcrumb .current { color:#F2F3F5; }
 
-  /* gallery masonry — same layout/dimensions as the product gallery */
+  /* gallery masonry — real project photography, captioned */
   .gallery { column-count:1; column-gap:20px; }
   @media (min-width:640px) { .gallery { column-count:2; } }
   @media (min-width:1024px) { .gallery { column-count:3; column-gap:24px; } }
-  .gallery-item {
-    break-inside:avoid; margin:0 0 20px; width:100%; padding:0; border:none;
-    background:#121315; border-radius:18px; overflow:hidden; position:relative; display:block;
-    -webkit-tap-highlight-color:transparent;
+  .gallery-item { break-inside:avoid; margin:0 0 26px; width:100%; }
+  .gallery-photo-btn {
+    border:1px solid #26282C; background:#121315; border-radius:16px; overflow:hidden; position:relative;
+    display:block; width:100%; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
+  .gallery-photo-btn img { width:100%; height:auto; display:block; transition:transform .9s cubic-bezier(.22,1,.36,1); }
+  @media (pointer:fine) { .gallery-photo-btn:hover img { transform:scale(1.06); } }
+  .gallery-overlay { position:absolute; inset:0; background:rgba(9,10,11,.5); opacity:0; transition:opacity .45s ease; pointer-events:none; }
+  .gallery-photo-btn:hover .gallery-overlay { opacity:1; }
+  .gallery-plus {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.55);
+    width:60px; height:60px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.4); background:rgba(13,13,13,.3);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center; color:#F2F3F5;
+    opacity:0; transition:opacity .4s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  .gallery-photo-btn:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .gallery-photo-btn:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
+  .gallery-caption {
+    margin-top:12px; padding:0 2px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:#9BA1A8; transition:color .3s;
+  }
+  .gallery-item:hover .gallery-caption { color:#4DA3FF; }
 
-  /* placeholder tiles — soft industrial texture, ready to swap for real photos */
-  .gallery-placeholder {
-    aspect-ratio: var(--ph-ratio, 4/3);
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,.014) 0 2px, transparent 2px 14px),
-      linear-gradient(155deg, #16181b 0%, #1c1f23 45%, #14161a 100%);
-    border:1px solid #23262b;
+  /* lightbox — fullscreen, swipeable */
+  .lightbox {
+    position:fixed; inset:0; z-index:200; background:rgba(5,6,7,.97);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     display:flex; align-items:center; justify-content:center;
-    transition:transform .5s cubic-bezier(.22,1,.36,1), border-color .4s, box-shadow .4s;
+    opacity:0; visibility:hidden; transition:opacity .4s ease, visibility .4s;
+    touch-action:none;
   }
-  .gallery-placeholder:hover { transform:translateY(-5px); border-color:rgba(77,163,255,.32); box-shadow:0 18px 40px rgba(0,0,0,.35); }
-  .ph-inner { display:flex; flex-direction:column; align-items:center; gap:12px; color:#4b5560; transition:transform .45s cubic-bezier(.22,1,.36,1), color .4s; }
-  .gallery-placeholder:hover .ph-inner { transform:scale(1.06); color:#6d7986; }
-  .ph-icon { opacity:.65; }
-  .ph-text { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#6d7986; }
+  .lightbox.is-open { opacity:1; visibility:visible; }
+  .lightbox-img { max-width:92vw; max-height:86vh; border-radius:10px; box-shadow:0 40px 100px rgba(0,0,0,.65); display:block; }
+  .lb-btn { position:absolute; display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,.14); background:rgba(18,19,21,.7); color:#F2F3F5; transition:background .25s, border-color .25s, transform .25s; backdrop-filter:blur(8px); }
+  .lb-btn:hover { background:rgba(77,163,255,.18); border-color:rgba(77,163,255,.6); transform:scale(1.06); }
+  .lb-close { top:22px; right:22px; }
+  .lb-prev { left:22px; top:50%; transform:translateY(-50%); }
+  .lb-next { right:22px; top:50%; transform:translateY(-50%); }
+  .lb-prev:hover, .lb-next:hover { transform:translateY(-50%) scale(1.06); }
+  .lb-counter { position:absolute; bottom:22px; left:50%; transform:translateX(-50%); font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.18em; color:#9BA1A8; text-align:center; max-width:80vw; }
+  @media (max-width:640px) { .lb-prev { left:10px; } .lb-next { right:10px; } .lb-btn { width:42px; height:42px; } }
 
   /* primary CTA button (matches site enquiry button) */
   .cta-primary { display:inline-flex; align-items:center; gap:10px; padding:16px 34px; border:none; border-radius:12px; cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#0D0D0D; font-weight:600; text-decoration:none; background:linear-gradient(135deg,#4DA3FF 0%,#1E7FE0 50%,#4DA3FF 100%); background-size:200% 200%; background-position:0% 50%; box-shadow:0 4px 24px rgba(77,163,255,.3), 0 0 0 1px rgba(77,163,255,.2) inset; transition:background-position .5s ease, box-shadow .3s, transform .25s cubic-bezier(.22,1,.36,1); }
@@ -253,7 +276,7 @@ tailwind.config = {
     <p class="eyebrow mb-6" data-reveal="1">Overview</p>
     <h2 class="display-xl text-[clamp(1.7rem,3.6vw,3.2rem)] mb-8" data-reveal="1">Professional Miscellaneous Metal Work</h2>
     <div class="hairline w-16 mx-auto mb-10" data-reveal="1"></div>
-    <p class="text-base lg:text-lg leading-relaxed text-tidim" data-reveal="1">Our miscellaneous metal work service delivers precision-fabricated components for projects that demand both function and finish — handrails, staircases, aluminium louvers, car-parking shed structures and substation chequer plates engineered to exact specification. Typical applications span commercial buildings, residential compounds, parking facilities and utility substations across the UAE, where safety, corrosion resistance and clean welds are non-negotiable. Facilities managers, contractors and developers choose ADSD for this work because it is produced entirely in-house, allowing tight tolerances, consistent quality and fast turnaround without relying on third-party fabricators. From a single balustrade to a full site package, our certified metal workers deliver the same standard of craftsmanship on every order.</p>
+    <p class="text-base lg:text-lg leading-relaxed text-tidim" data-reveal="1">Precision-fabricated handrails, bollards, screens, corner guards, and architectural metalwork engineered to exact specification. Produced entirely in-house for commercial, residential, and hospitality projects across the UAE.</p>
   </div>
 </section>
 
@@ -265,46 +288,70 @@ tailwind.config = {
         <p class="eyebrow mb-6" data-reveal="1">Gallery</p>
         <h2 class="display-xl text-[clamp(1.8rem,3.6vw,3.2rem)]" data-reveal="1">Service Gallery</h2>
       </div>
-      <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Project photography coming soon.</p>
+      <p class="font-mono text-[11px] tracking-[.18em] uppercase text-tidim max-w-xs" data-reveal="1">Click any image to enlarge.</p>
     </div>
 
     <div class="gallery" id="gallery">
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:4/5" aria-label="Miscellaneous Metal Work photo placeholder 1 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:1/1" aria-label="Miscellaneous Metal Work photo placeholder 2 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:3/4" aria-label="Miscellaneous Metal Work photo placeholder 3 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:5/4" aria-label="Miscellaneous Metal Work photo placeholder 4 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:4/3" aria-label="Miscellaneous Metal Work photo placeholder 5 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
-      <div class="gallery-item gallery-placeholder" style="--ph-ratio:3/4" aria-label="Miscellaneous Metal Work photo placeholder 6 — image coming soon">
-        <div class="ph-inner">
-          <svg class="ph-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <p class="ph-text">Image Coming Soon</p>
-        </div>
-      </div>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="0" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-1.jpg" data-caption="Stainless Steel Bollard Installation" aria-label="Enlarge Stainless Steel Bollard Installation photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-1.jpg" alt="Stainless Steel Bollard Installation — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Stainless Steel Bollard Installation</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="1" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-2.jpeg" data-caption="Glass Handrail with Marble Staircase" aria-label="Enlarge Glass Handrail with Marble Staircase photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-2.jpeg" alt="Glass Handrail with Marble Staircase — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Glass Handrail with Marble Staircase</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="2" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-3.jpeg" data-caption="Decorative Screen Panel" aria-label="Enlarge Decorative Screen Panel photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-3.jpeg" alt="Decorative Screen Panel — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Decorative Screen Panel</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="3" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-4.jpeg" data-caption="Decorative AC Grille" aria-label="Enlarge Decorative AC Grille photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-4.jpeg" alt="Decorative AC Grille — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Decorative AC Grille</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="4" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-5.jpg" data-caption="Stainless Steel Corner Guard" aria-label="Enlarge Stainless Steel Corner Guard photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-5.jpg" alt="Stainless Steel Corner Guard — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Stainless Steel Corner Guard</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <button type="button" class="gallery-photo-btn" data-index="5" data-full="images/miscellaneous-metal-work/miscellaneous-metal-work-6.jpeg" data-caption="Custom Sign Board" aria-label="Enlarge Custom Sign Board photo">
+          <img src="images/miscellaneous-metal-work/miscellaneous-metal-work-6.jpeg" alt="Custom Sign Board — Miscellaneous Metal Work by ADSD" loading="lazy" decoding="async" />
+          <span class="gallery-overlay" aria-hidden="true"></span>
+          <span class="gallery-plus" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <figcaption class="gallery-caption">Custom Sign Board</figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -379,6 +426,15 @@ tailwind.config = {
     <span class="fab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
     <span class="fab-label">Enquire Now</span>
   </a>
+</div>
+
+<!-- ================= LIGHTBOX ================= -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Miscellaneous Metal Work image viewer">
+  <button class="lb-btn lb-close" id="lb-close" aria-label="Close viewer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  <button class="lb-btn lb-prev" id="lb-prev" aria-label="Previous image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <img class="lightbox-img" id="lb-img" src="" alt="" />
+  <button class="lb-btn lb-next" id="lb-next" aria-label="Next image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <div class="lb-counter" id="lb-counter"></div>
 </div>
 
 <!-- ================= SCRIPTS ================= -->
@@ -489,6 +545,88 @@ tailwind.config = {
       setTimeout(function () { ripple.remove(); }, 600);
     });
   });
+  /* lightbox */
+  (function initLightbox() {
+    var items = Array.prototype.slice.call(document.querySelectorAll('#gallery .gallery-photo-btn'));
+    if (!items.length) return;
+    var sources = items.map(function (it) { return it.getAttribute('data-full'); });
+    var captions = items.map(function (it) { return it.getAttribute('data-caption') || ''; });
+    var lb = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lb-img');
+    var lbCounter = document.getElementById('lb-counter');
+    var current = 0;
+
+    function updateCounter() {
+      lbCounter.textContent = (captions[current] ? captions[current] + ' — ' : '') + (current + 1) + ' / ' + sources.length;
+    }
+    function show(i) {
+      current = (i + sources.length) % sources.length;
+      updateCounter();
+      var pre = new Image();
+      if (window.gsap && !reduceMotion) {
+        gsap.to(lbImg, { opacity:0, scale:.96, duration:.2, ease:'power2.in', onComplete:function () {
+          pre.onload = function () {
+            lbImg.src = sources[current]; lbImg.alt = captions[current];
+            gsap.fromTo(lbImg, { opacity:0, scale:.96 }, { opacity:1, scale:1, duration:.4, ease:'power3.out' });
+          };
+          pre.src = sources[current];
+        }});
+      } else {
+        lbImg.style.opacity = '0';
+        pre.onload = function () { lbImg.src = sources[current]; lbImg.alt = captions[current]; lbImg.style.opacity = '1'; };
+        pre.src = sources[current];
+      }
+    }
+    function openLb(i) {
+      current = (i + sources.length) % sources.length;
+      updateCounter();
+      var pre = new Image();
+      lbImg.style.opacity = '0';
+      pre.onload = function () {
+        lbImg.src = sources[current]; lbImg.alt = captions[current];
+        if (window.gsap && !reduceMotion) {
+          gsap.fromTo(lbImg, { opacity:0, scale:.9 }, { opacity:1, scale:1, duration:.5, ease:'power3.out' });
+        } else {
+          lbImg.style.opacity = '1';
+        }
+      };
+      pre.src = sources[current];
+      lb.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+      lb.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    items.forEach(function (it, i) { it.addEventListener('click', function () { openLb(i); }); });
+    document.getElementById('lb-close').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(current - 1); });
+    document.getElementById('lb-next').addEventListener('click', function (e) { e.stopPropagation(); show(current + 1); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeLb();
+      else if (e.key === 'ArrowLeft') show(current - 1);
+      else if (e.key === 'ArrowRight') show(current + 1);
+    });
+
+    var touchStartX = 0, touchStartY = 0, touchActive = false;
+    lb.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchActive = true;
+    }, { passive:true });
+    lb.addEventListener('touchend', function (e) {
+      if (!touchActive) return;
+      touchActive = false;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) show(current + 1); else show(current - 1);
+      }
+    }, { passive:true });
+  })();
 })();
 </script>
 </body>
