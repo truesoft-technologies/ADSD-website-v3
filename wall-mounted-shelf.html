@@ -94,41 +94,55 @@ tailwind.config = {
   .breadcrumb .sep { color:#3a3f45; }
   .breadcrumb .current { color:#F2F3F5; }
 
-  /* gallery masonry — real project photography, captioned */
-  .gallery { column-count:1; column-gap:20px; }
+  /* gallery — true masonry, real project photography, captioned */
+  .gallery { column-count:1; column-gap:24px; }
   @media (min-width:640px) { .gallery { column-count:2; } }
-  @media (min-width:1024px) { .gallery { column-count:3; column-gap:24px; } }
-  .gallery-item { break-inside:avoid; margin:0 0 26px; width:100%; }
+  @media (min-width:1024px) { .gallery { column-count:3; column-gap:28px; } }
+  .gallery-item { break-inside:avoid; margin-bottom:28px; }
   .gallery-photo-btn {
-    border:1px solid #26282C; background:#121315; border-radius:16px; overflow:hidden; position:relative;
-    display:block; width:100%; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    position:relative; display:block; width:100%; padding:0; overflow:hidden;
+    background:#121315; border-radius:3px; cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
+  .gallery-photo-btn::before, .gallery-photo-btn::after {
+    content:''; position:absolute; width:20px; height:20px; z-index:2; pointer-events:none;
+    border-color:rgba(77,163,255,0); transition:border-color .4s ease;
+  }
+  .gallery-photo-btn::before { top:10px; left:10px; border-top:1px solid; border-left:1px solid; }
+  .gallery-photo-btn::after { bottom:10px; right:10px; border-bottom:1px solid; border-right:1px solid; }
+  .gallery-photo-btn:hover::before, .gallery-photo-btn:hover::after,
+  .gallery-photo-btn:focus-visible::before, .gallery-photo-btn:focus-visible::after { border-color:#4DA3FF; }
   .gallery-photo-btn img {
     width:100%; height:auto; display:block;
-    transition:transform .9s cubic-bezier(.22,1,.36,1), opacity .6s ease;
+    transition:transform .9s cubic-bezier(.22,1,.36,1);
   }
   @media (pointer:fine) { .gallery-photo-btn:hover img { transform:scale(1.06); } }
   .gallery-overlay {
-    position:absolute; inset:0; background:rgba(9,10,11,.5);
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(9,10,11,0) 55%, rgba(9,10,11,.85) 100%);
     opacity:0; transition:opacity .45s ease; pointer-events:none;
   }
-  .gallery-photo-btn:hover .gallery-overlay { opacity:1; }
+  .gallery-photo-btn:hover .gallery-overlay, .gallery-photo-btn:focus-visible .gallery-overlay { opacity:1; }
   .gallery-plus {
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.55);
-    width:60px; height:60px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.4); background:rgba(13,13,13,.3);
+    position:absolute; right:14px; bottom:14px; transform:translateY(6px);
+    width:38px; height:38px; border-radius:50%; z-index:2;
+    border:1px solid rgba(255,255,255,.4); background:rgba(13,13,13,.4);
     backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     display:flex; align-items:center; justify-content:center; color:#F2F3F5;
-    opacity:0; transition:opacity .4s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
+    opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.22,1,.36,1);
     pointer-events:none;
   }
-  .gallery-photo-btn:hover .gallery-plus { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .gallery-photo-btn:hover .gallery-plus, .gallery-photo-btn:focus-visible .gallery-plus { opacity:1; transform:translateY(0); }
   .gallery-photo-btn:focus-visible { outline:2px solid #4DA3FF; outline-offset:3px; }
   .gallery-caption {
-    margin-top:12px; padding:0 2px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+    position:relative; margin-top:14px; padding-left:14px; font-family:"IBM Plex Mono",monospace; font-size:11px;
     letter-spacing:.14em; text-transform:uppercase; color:#9BA1A8; transition:color .3s;
   }
+  .gallery-caption::before {
+    content:''; position:absolute; left:0; top:.5em; width:8px; height:1px; background:#3a3f45;
+    transition:background-color .3s, width .3s;
+  }
   .gallery-item:hover .gallery-caption { color:#4DA3FF; }
+  .gallery-item:hover .gallery-caption::before { background:#4DA3FF; width:14px; }
 
   /* lightbox — fullscreen, swipeable */
   .lightbox {
@@ -150,13 +164,14 @@ tailwind.config = {
   @media (max-width:640px) { .lb-prev { left:10px; } .lb-next { right:10px; } .lb-btn { width:42px; height:42px; } }
 
   /* primary CTA button (matches site enquiry button) */
-  .cta-primary { display:inline-flex; align-items:center; gap:10px; padding:16px 34px; border:none; border-radius:12px; cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#0D0D0D; font-weight:600; text-decoration:none; background:linear-gradient(135deg,#4DA3FF 0%,#1E7FE0 50%,#4DA3FF 100%); background-size:200% 200%; background-position:0% 50%; box-shadow:0 4px 24px rgba(77,163,255,.3), 0 0 0 1px rgba(77,163,255,.2) inset; transition:background-position .5s ease, box-shadow .3s, transform .25s cubic-bezier(.22,1,.36,1); }
-  .cta-primary:hover { background-position:100% 50%; box-shadow:0 8px 36px rgba(77,163,255,.45), 0 0 0 1px rgba(77,163,255,.3) inset; transform:translateY(-2px); }
+  .cta-primary { display:inline-flex; align-items:center; gap:10px; padding:14px 30px; border:1px solid rgba(77,163,255,.6); border-radius:0; cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#4DA3FF; font-weight:600; text-decoration:none; background:transparent; transition:background-color .3s, color .3s, border-color .3s, transform .25s cubic-bezier(.22,1,.36,1); }
+  .cta-primary:hover { background:#4DA3FF; color:#0D0D0D; border-color:#4DA3FF; transform:translateY(-2px); }
   .cta-primary .cta-arrow { transition:transform .3s; }
   .cta-primary:hover .cta-arrow { transform:translateX(5px); }
 
   /* floating contact widget */
-  #fab-widget { position:fixed; bottom:28px; right:28px; z-index:100; display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+  #fab-widget { position:fixed; bottom:28px; right:28px; z-index:100; display:flex; flex-direction:column; gap:10px; align-items:flex-end; transition:opacity .25s ease, visibility .25s ease; }
+  body.mobile-menu-open #fab-widget { opacity:0; visibility:hidden; pointer-events:none; }
   .fab-btn { position:relative; display:flex; align-items:center; gap:0; height:52px; min-width:52px; border-radius:26px; border:1px solid rgba(255,255,255,.08); background:rgba(18,19,21,.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 6px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04) inset; padding:0 15px 0 14px; cursor:pointer; overflow:hidden; transition:gap .35s cubic-bezier(.22,1,.36,1), padding .35s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s, transform .3s cubic-bezier(.22,1,.36,1); text-decoration:none; animation:fab-float 4s ease-in-out infinite; }
   .fab-btn:nth-child(1) { animation-delay:0s; } .fab-btn:nth-child(2) { animation-delay:.6s; } .fab-btn:nth-child(3) { animation-delay:1.2s; }
   @keyframes fab-float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
@@ -183,7 +198,7 @@ tailwind.config = {
 <div id="cursor-dot"></div>
 
 <!-- ================= NAV ================= -->
-<header class="fixed top-0 inset-x-0 z-50 border-b border-line/70 bg-ink/80 backdrop-blur-md">
+<header class="fixed top-0 inset-x-0 z-[60] border-b border-line/70 bg-ink/80 backdrop-blur-md">
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-6">
     <a href="index.html#top" class="flex items-baseline gap-3 group">
       <span class="font-display text-2xl tracking-wide text-ti group-hover:text-steel transition-colors">ADSD</span>
@@ -191,7 +206,7 @@ tailwind.config = {
     </a>
     <nav class="hidden lg:flex items-center gap-8 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1">
           Company
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -202,7 +217,7 @@ tailwind.config = {
         </div>
       </div>
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="services">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1" data-nav-group="services">
           Services
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -213,7 +228,7 @@ tailwind.config = {
         </div>
       </div>
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="products">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1" data-nav-group="products">
           Products
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -299,7 +314,7 @@ tailwind.config = {
     <div class="gallery" id="gallery">
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="0" data-full="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" data-caption="Floor-Standing Storage Frame" aria-label="Enlarge Floor-Standing Storage Frame photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" alt="Floor-Standing Storage Frame — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-1.jpeg" alt="Floor-Standing Storage Frame — ADSD" width="742" height="399" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -309,7 +324,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="1" data-full="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" data-caption="Commercial Cooking Range Unit" aria-label="Enlarge Commercial Cooking Range Unit photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" alt="Commercial Cooking Range Unit — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-2.jpeg" alt="Commercial Cooking Range Unit — ADSD" width="508" height="298" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -319,7 +334,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="2" data-full="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" data-caption="Wire Mesh Storage Racks" aria-label="Enlarge Wire Mesh Storage Racks photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" alt="Wire Mesh Storage Racks — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-3.jpeg" alt="Wire Mesh Storage Racks — ADSD" width="781" height="757" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -329,7 +344,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="3" data-full="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" data-caption="Stainless Steel Work Table" aria-label="Enlarge Stainless Steel Work Table photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" alt="Stainless Steel Work Table — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-4.jpeg" alt="Stainless Steel Work Table — ADSD" width="352" height="280" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -339,7 +354,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="4" data-full="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" data-caption="Work Table with Backsplash" aria-label="Enlarge Work Table with Backsplash photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" alt="Work Table with Backsplash — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-5.jpeg" alt="Work Table with Backsplash — ADSD" width="297" height="228" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -349,7 +364,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="5" data-full="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" data-caption="Stainless Steel Stool" aria-label="Enlarge Stainless Steel Stool photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" alt="Stainless Steel Stool — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-6.jpeg" alt="Stainless Steel Stool — ADSD" width="664" height="607" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -359,7 +374,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="6" data-full="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" data-caption="Stainless Steel Handrail" aria-label="Enlarge Stainless Steel Handrail photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" alt="Stainless Steel Handrail — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-7.jpeg" alt="Stainless Steel Handrail — ADSD" width="598" height="381" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -369,7 +384,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="7" data-full="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" data-caption="Mobile Stainless Steel Basin" aria-label="Enlarge Mobile Stainless Steel Basin photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" alt="Mobile Stainless Steel Basin — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-8.jpeg" alt="Mobile Stainless Steel Basin — ADSD" width="382" height="355" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -379,7 +394,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="8" data-full="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" data-caption="Wall Mounted Shelf with Brackets" aria-label="Enlarge Wall Mounted Shelf with Brackets photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" alt="Wall Mounted Shelf with Brackets — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-9.jpeg" alt="Wall Mounted Shelf with Brackets — ADSD" width="393" height="250" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -389,7 +404,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="9" data-full="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" data-caption="Cabinet Handle Detail" aria-label="Enlarge Cabinet Handle Detail photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" alt="Cabinet Handle Detail — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-10.jpeg" alt="Cabinet Handle Detail — ADSD" width="493" height="307" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -399,7 +414,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="10" data-full="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" data-caption="Decorative Gold Screen Panel" aria-label="Enlarge Decorative Gold Screen Panel photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" alt="Decorative Gold Screen Panel — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-11.jpeg" alt="Decorative Gold Screen Panel — ADSD" width="304" height="486" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -409,7 +424,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="11" data-full="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" data-caption="Vanity Cabinet with Brass Trim" aria-label="Enlarge Vanity Cabinet with Brass Trim photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" alt="Vanity Cabinet with Brass Trim — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-12.jpeg" alt="Vanity Cabinet with Brass Trim — ADSD" width="1220" height="929" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -419,7 +434,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="12" data-full="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" data-caption="Triple Bowl Sink Unit" aria-label="Enlarge Triple Bowl Sink Unit photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" alt="Triple Bowl Sink Unit — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-13.jpeg" alt="Triple Bowl Sink Unit — ADSD" width="373" height="309" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -429,7 +444,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="13" data-full="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" data-caption="Storage Room Shelving — Installed" aria-label="Enlarge Storage Room Shelving — Installed photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" alt="Storage Room Shelving — Installed — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-14.jpeg" alt="Storage Room Shelving — Installed — ADSD" width="1200" height="1600" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -439,7 +454,7 @@ tailwind.config = {
         </figure>
         <figure class="gallery-item">
           <button type="button" class="gallery-photo-btn" data-index="14" data-full="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" data-caption="Glass Staircase Handrail" aria-label="Enlarge Glass Staircase Handrail photo">
-            <img src="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" alt="Glass Staircase Handrail — ADSD" loading="lazy" decoding="async" />
+            <img src="images/wall-mounted-shelf/wall-mounted-shelf-15.jpeg" alt="Glass Staircase Handrail — ADSD" width="1280" height="960" loading="lazy" decoding="async" />
             <span class="gallery-overlay" aria-hidden="true"></span>
             <span class="gallery-plus" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -598,12 +613,14 @@ tailwind.config = {
       var open = mobileMenu.classList.toggle('is-open');
       hamburger.classList.toggle('is-open', open);
       document.body.style.overflow = open ? 'hidden' : '';
+      document.body.classList.toggle('mobile-menu-open', open);
     });
     mobileMenu.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () {
         mobileMenu.classList.remove('is-open');
         hamburger.classList.remove('is-open');
         document.body.style.overflow = '';
+        document.body.classList.remove('mobile-menu-open');
       });
     });
     mobileMenu.querySelectorAll('.mobile-toggle').forEach(function (toggle) {

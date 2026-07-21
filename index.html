@@ -215,39 +215,16 @@ tailwind.config = {
   .product-enquire {
     align-self: flex-start; margin-top: 22px;
     display: inline-flex; align-items: center; gap: 8px;
-    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
-    color: #4DA3FF; border: 1px solid rgba(77,163,255,.4); border-radius: 8px; padding: 10px 18px;
-    text-decoration: none; transition: background .3s, color .3s, border-color .3s, gap .3s;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: #4DA3FF; background: transparent; border: 1px solid rgba(77,163,255,.6); border-radius: 0; padding: 8px 16px;
+    text-decoration: none; transition: opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1), background .3s, color .3s, border-color .3s, gap .3s;
+    opacity: 0; transform: translateY(6px);
   }
-  .product-enquire:hover { background: #4DA3FF; color: #0D0D0D; border-color: #4DA3FF; gap: 12px; }
+  .product-card:hover .product-enquire,
+  .product-card:focus-visible .product-enquire { opacity: 1; transform: translateY(0); }
+  .product-card:hover .product-enquire { background: #4DA3FF; color: #0D0D0D; border-color: #4DA3FF; gap: 12px; }
   .product-enquire svg { transition: transform .3s; }
-  .product-enquire:hover svg { transform: translateX(3px); }
-
-  /* view more products — secondary CTA */
-  .view-more-btn {
-    display: inline-flex; align-items: center; gap: 12px;
-    font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
-    color: #F2F3F5; background: transparent;
-    border: 1px solid #26282C; border-radius: 12px; padding: 16px 34px; cursor: pointer;
-    transition: border-color .4s, color .35s, background .4s, transform .3s cubic-bezier(.22,1,.36,1);
-    position: relative; overflow: hidden;
-  }
-  .view-more-btn:hover { border-color: rgba(77,163,255,.55); color: #4DA3FF; transform: translateY(-2px); }
-  .view-more-btn .vm-arrow {
-    display: inline-flex; transition: transform .4s cubic-bezier(.22,1,.36,1);
-  }
-  .view-more-btn:hover .vm-arrow { transform: translateX(5px); }
-  .view-more-btn.is-nudge { animation: vm-nudge .5s ease; }
-  @keyframes vm-nudge {
-    0%,100% { transform: translateY(-2px) translateX(0); }
-    25% { transform: translateY(-2px) translateX(-4px); }
-    75% { transform: translateY(-2px) translateX(4px); }
-  }
-  .view-more-note {
-    margin-top: 14px; font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .16em;
-    text-transform: uppercase; color: #9BA1A8; opacity: 0; transition: opacity .4s;
-  }
-  .view-more-note.is-visible { opacity: 1; }
+  .product-card:hover .product-enquire svg { transform: translateX(3px); }
 
   /* ---------- why choose us ---------- */
   .why-card {
@@ -295,14 +272,6 @@ tailwind.config = {
     transition: background .3s, transform .3s;
   }
   .contact-info-card:hover .contact-icon-wrap { background: rgba(77,163,255,.15); transform: scale(1.08); }
-  .trust-item {
-    display: flex; align-items: center; gap: 10px;
-    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #9BA1A8;
-  }
-  .trust-check {
-    width: 20px; height: 20px; border-radius: 50%; background: rgba(77,163,255,.1); border: 1px solid rgba(77,163,255,.25);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
 
   /* glassmorphism form card */
   .contact-form-card {
@@ -336,18 +305,14 @@ tailwind.config = {
   textarea.contact-input { resize: none; }
 
   .contact-submit-btn {
-    width: 100%; padding: 16px 28px; border: none; border-radius: 12px; cursor: pointer;
+    width: 100%; padding: 16px 28px; border: 1px solid rgba(77,163,255,.6); border-radius: 0; cursor: pointer;
     font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
-    color: #0D0D0D; font-weight: 600;
-    background: linear-gradient(135deg, #4DA3FF 0%, #1E7FE0 50%, #4DA3FF 100%);
-    background-size: 200% 200%; background-position: 0% 50%;
-    box-shadow: 0 4px 24px rgba(77,163,255,.3), 0 0 0 1px rgba(77,163,255,.2) inset;
-    transition: background-position .5s ease, box-shadow .3s, transform .25s cubic-bezier(.22,1,.36,1);
+    color: #4DA3FF; font-weight: 600; background: transparent;
+    transition: background-color .3s, color .3s, border-color .3s, transform .25s cubic-bezier(.22,1,.36,1);
     position: relative; overflow: hidden;
   }
   .contact-submit-btn:hover {
-    background-position: 100% 50%;
-    box-shadow: 0 8px 36px rgba(77,163,255,.45), 0 0 0 1px rgba(77,163,255,.3) inset;
+    background: #4DA3FF; color: #0D0D0D; border-color: #4DA3FF;
     transform: translateY(-2px);
   }
   .contact-submit-btn:active { transform: translateY(0); }
@@ -360,7 +325,9 @@ tailwind.config = {
   #fab-widget {
     position: fixed; bottom: 28px; right: 28px; z-index: 100;
     display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+    transition: opacity .25s ease, visibility .25s ease;
   }
+  body.mobile-menu-open #fab-widget { opacity: 0; visibility: hidden; pointer-events: none; }
   .fab-btn {
     position: relative; display: flex; align-items: center; gap: 0;
     height: 52px; min-width: 52px; border-radius: 26px;
@@ -460,7 +427,7 @@ tailwind.config = {
 <div id="cursor-dot"></div>
 
 <!-- ================= NAV ================= -->
-<header class="fixed top-0 inset-x-0 z-50 border-b border-line/70 bg-ink/80 backdrop-blur-md" data-screen-label="Navigation">
+<header class="fixed top-0 inset-x-0 z-[60] border-b border-line/70 bg-ink/80 backdrop-blur-md" data-screen-label="Navigation">
   <div class="max-w-[1400px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-6">
     <a href="#top" class="flex items-baseline gap-3 group">
       <span class="font-display text-2xl tracking-wide text-ti group-hover:text-steel transition-colors">ADSD</span>
@@ -468,7 +435,7 @@ tailwind.config = {
     </a>
     <nav class="hidden lg:flex items-center gap-8 font-mono text-[11px] tracking-[.18em] uppercase text-tidim">
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1">
           Company
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -479,7 +446,7 @@ tailwind.config = {
         </div>
       </div>
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="services">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1" data-nav-group="services">
           Services
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -490,7 +457,7 @@ tailwind.config = {
         </div>
       </div>
       <div class="nav-dropdown">
-        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5" data-hover="1" data-nav-group="products">
+        <button class="nav-trigger hover:text-ti transition-colors flex items-center gap-1.5 uppercase" data-hover="1" data-nav-group="products">
           Products
           <svg class="w-3 h-3 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3"/></svg>
         </button>
@@ -695,7 +662,7 @@ tailwind.config = {
       <a href="miscellaneous-metal-work.html" class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1" aria-label="Explore Miscellaneous Metal Work service">
         <div class="seg-media" aria-hidden="true">
           <img class="seg-img" loading="lazy" decoding="async" alt=""
-               src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&amp;fit=crop&amp;w=1200&amp;q=70&amp;fm=webp" />
+               src="images/miscellaneous-metal-work-hero/miscellaneous-metal-work-hero.jpg" />
         </div>
         <div class="flex lg:flex-col gap-4">
           <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—02</span>
@@ -711,7 +678,7 @@ tailwind.config = {
       <a href="supply-services.html" class="seg-card group p-6 lg:p-7 flex lg:flex-col justify-between min-h-[150px]" data-hover="1" aria-label="Explore Supply Services service">
         <div class="seg-media" aria-hidden="true">
           <img class="seg-img" loading="lazy" decoding="async" alt=""
-               src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&amp;fit=crop&amp;w=1200&amp;q=70&amp;fm=webp" />
+               src="images/supply-services-hero/supply-services-hero.jpg" />
         </div>
         <div class="flex lg:flex-col gap-4">
           <span class="font-mono text-[11px] tracking-[.2em] text-steel">S—03</span>
@@ -724,17 +691,6 @@ tailwind.config = {
         </div>
       </a>
 
-    </div>
-
-    <!-- View More Services -->
-    <div class="mt-16 flex flex-col items-center" data-reveal="1">
-      <button id="view-more-services" class="view-more-btn" data-hover="1" aria-label="View more services — coming soon">
-        View More Services
-        <span class="vm-arrow" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </span>
-      </button>
-      <p id="view-more-services-note" class="view-more-note" role="status" aria-live="polite">More services coming soon</p>
     </div>
   </div>
 </section>
@@ -826,7 +782,7 @@ tailwind.config = {
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid">
 
       <!-- Mopping Sink -->
-      <article class="product-card">
+      <a href="mopping-sink.html" class="product-card" data-hover="1" aria-label="Explore Mopping Sink details">
         <div class="product-media">
           <span class="product-tag">Janitorial</span>
           <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel mopping sink illustration">
@@ -856,15 +812,15 @@ tailwind.config = {
         <div class="product-body">
           <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Mopping Sink</h3>
           <p class="text-sm text-tidim leading-relaxed">Designed for commercial and industrial cleaning areas, offering durability, hygiene, and easy maintenance.</p>
-          <a href="mopping-sink.html" class="product-enquire" data-hover="1" aria-label="Explore Mopping Sink details">
+          <span class="product-enquire">
             Explore More
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Wall Mounted Shelf -->
-      <article class="product-card">
+      <a href="wall-mounted-shelf.html" class="product-card" data-hover="1" aria-label="Explore Wall Mounted Shelf details">
         <div class="product-media">
           <span class="product-tag">Storage</span>
           <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel wall mounted shelf illustration">
@@ -897,15 +853,15 @@ tailwind.config = {
         <div class="product-body">
           <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Wall Mounted Shelf</h3>
           <p class="text-sm text-tidim leading-relaxed">Premium stainless steel wall-mounted shelves built for strength, organization, and long-term use.</p>
-          <a href="wall-mounted-shelf.html" class="product-enquire" data-hover="1" aria-label="Explore Wall Mounted Shelf details">
+          <span class="product-enquire">
             Explore More
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Triple Bowl Sink -->
-      <article class="product-card">
+      <a href="triple-bowl-sink.html" class="product-card" data-hover="1" aria-label="Explore Triple Bowl Sink details">
         <div class="product-media">
           <span class="product-tag">Commercial</span>
           <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stainless steel triple bowl sink illustration">
@@ -938,24 +894,13 @@ tailwind.config = {
         <div class="product-body">
           <h3 class="font-display text-xl uppercase tracking-wide text-ti mb-3">Triple Bowl Sink</h3>
           <p class="text-sm text-tidim leading-relaxed">Heavy-duty triple bowl sink designed for commercial kitchens and food preparation environments.</p>
-          <a href="triple-bowl-sink.html" class="product-enquire" data-hover="1" aria-label="Explore Triple Bowl Sink details">
+          <span class="product-enquire">
             Explore More
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
-    </div>
-
-    <!-- View More -->
-    <div class="mt-16 flex flex-col items-center" data-reveal="1">
-      <button id="view-more-products" class="view-more-btn" data-hover="1" aria-label="View more products — coming soon">
-        View More Products
-        <span class="vm-arrow" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </span>
-      </button>
-      <p id="view-more-note" class="view-more-note" role="status" aria-live="polite">More products coming soon</p>
     </div>
   </div>
 </section>
@@ -1106,7 +1051,7 @@ tailwind.config = {
           </div>
           <div class="sm:col-span-2 flex items-center justify-between gap-4 flex-wrap">
             <p id="rv-msg" class="font-mono text-[10px] tracking-[.16em] uppercase text-safetytx"></p>
-            <button type="submit" class="font-mono text-[12px] tracking-[.18em] uppercase bg-steel text-ti px-8 py-4 hover:bg-steeltx hover:text-white transition-colors" data-hover="1">Submit review →</button>
+            <button type="submit" class="font-mono text-[12px] tracking-[.18em] uppercase border border-steel/60 text-steel bg-transparent px-8 py-4 hover:bg-steel hover:text-ink transition-colors" data-hover="1">Submit review →</button>
           </div>
         </form>
       </div>
@@ -1160,22 +1105,6 @@ tailwind.config = {
               <p class="text-ti font-medium">Dubai &amp; Sharjah, UAE</p>
               <p class="text-tidim text-sm mt-0.5">Licensed in Dubai · Sharjah</p>
             </div>
-          </div>
-        </div>
-
-        <!-- Trust points -->
-        <div class="flex flex-col gap-3" id="contact-trust">
-          <div class="trust-item">
-            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
-            Fast Response
-          </div>
-          <div class="trust-item">
-            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
-            Free Consultation
-          </div>
-          <div class="trust-item">
-            <div class="trust-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#4DA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></div>
-            Tailored Business Solutions
           </div>
         </div>
       </div>
@@ -1549,12 +1478,14 @@ tailwind.config = {
       var open = mobileMenu.classList.toggle('is-open');
       hamburger.classList.toggle('is-open', open);
       document.body.style.overflow = open ? 'hidden' : '';
+      document.body.classList.toggle('mobile-menu-open', open);
     });
     mobileMenu.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () {
         mobileMenu.classList.remove('is-open');
         hamburger.classList.remove('is-open');
         document.body.style.overflow = '';
+        document.body.classList.remove('mobile-menu-open');
       });
     });
     mobileMenu.querySelectorAll('.mobile-toggle').forEach(function (toggle) {
@@ -1613,7 +1544,6 @@ tailwind.config = {
       .from('#contact-heading', { opacity: 0, y: 28, duration: .7, ease: 'power3.out' }, '-=.3')
       .from('#contact-sub', { opacity: 0, y: 20, duration: .6, ease: 'power2.out' }, '-=.4')
       .from('#contact-cards .contact-info-card', { opacity: 0, x: -24, duration: .55, ease: 'power2.out', stagger: .1 }, '-=.3')
-      .from('#contact-trust .trust-item', { opacity: 0, x: -16, duration: .45, ease: 'power2.out', stagger: .08 }, '-=.25')
       .from('#contact-form-card', { opacity: 0, y: 40, duration: .75, ease: 'power3.out' }, '-=.6')
       .from('#contact-form-card .contact-field', { opacity: 0, y: 16, duration: .45, ease: 'power2.out', stagger: .07 }, '-=.5')
       .from('#contact-form-card .contact-submit-btn', { opacity: 0, y: 12, scale: .97, duration: .45, ease: 'back.out(1.4)' }, '-=.25');
@@ -1689,42 +1619,10 @@ tailwind.config = {
       });
     }
 
-    /* View More Services — inactive, ready for future expansion */
-    var btn = document.getElementById('view-more-services');
-    var note = document.getElementById('view-more-services-note');
-    if (btn) {
-      var t;
-      btn.addEventListener('click', function () {
-        btn.classList.remove('is-nudge'); void btn.offsetWidth; btn.classList.add('is-nudge');
-        if (note) {
-          note.classList.add('is-visible');
-          clearTimeout(t);
-          t = setTimeout(function () { note.classList.remove('is-visible'); }, 3500);
-        }
-      });
-    }
   })();
 
   /* ============ OUR PRODUCTS ============ */
   (function initProducts() {
-    /* View More Products — inactive, ready for future expansion */
-    var vmBtn = document.getElementById('view-more-products');
-    var vmNote = document.getElementById('view-more-note');
-    if (vmBtn) {
-      var noteTimer;
-      vmBtn.addEventListener('click', function () {
-        if (window.gsap && !reduceMotion) {
-          gsap.fromTo(vmBtn, { x: 0 }, { x: 0, duration: .5, clearProps: 'x', ease: 'power1.out' });
-        }
-        vmBtn.classList.remove('is-nudge'); void vmBtn.offsetWidth; vmBtn.classList.add('is-nudge');
-        if (vmNote) {
-          vmNote.classList.add('is-visible');
-          clearTimeout(noteTimer);
-          noteTimer = setTimeout(function () { vmNote.classList.remove('is-visible'); }, 3500);
-        }
-      });
-    }
-
     /* Enquire Now → scroll to contact + pre-fill service/message */
     document.querySelectorAll('.product-enquire[data-enquire]').forEach(function (link) {
       link.addEventListener('click', function (e) {
